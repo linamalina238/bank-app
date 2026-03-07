@@ -1,0 +1,27 @@
+{
+  "name": "bank-app",
+  "version": "1.0.0",
+  "description": "A banking web application — university course project",
+  "main": "src/index.js",
+  "authors": [
+    "Teammate 1 — auth.js",
+    "Teammate 2 — account.js",
+    "Teammate 3 — transactions.js",
+    "Teammate 4 — ui.js",
+    "Teammate 5 — storage.js"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "npx live-server ."
+  },
+  "keywords": [
+    "bank",
+    "javascript",
+    "university",
+    "coursework"
+  ],
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
