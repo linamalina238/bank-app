@@ -2,15 +2,19 @@
 
 > Курсова робота — банківський веб-застосунок.
 
+## Опис
+
+Застосунок імітує базові функції банку: реєстрацію користувача, управління балансом, історію транзакцій та збереження даних між сесіями.
+
 ## Команда та розподіл роботи
 
-| Файл                  | Функціонал                                | Відповідальний |
-| --------------------- | ----------------------------------------- | -------------- |
-| `src/auth.js`         | Реєстрація, вхід, перевірка логіна/пароля | Teammate 1     |
-| `src/account.js`      | Рахунок, баланс, поповнення, списання     | Teammate 2     |
-| `src/transactions.js` | Перекази, історія, категорії витрат       | Teammate 3     |
-| `src/ui.js`           | DOM, кнопки, форми, динамічне оновлення   | Teammate 4     |
-| `src/storage.js`      | localStorage, збереження всіх даних       | Teammate 5     |
+| Файл                  | Функціонал                                  | Відповідальний   |
+| --------------------- | ------------------------------------------- | ---------------- |
+| `src/auth.js`         | Реєстрація, вхід, перевірка логіна/пароля   | Сітковська Аліна |
+| `src/account.js`      | Рахунок, баланс, поповнення, списання       | Наконечний Олег  |
+| `src/transactions.js` | Перекази, історія, категорії витрат         | Лобода Аліна     |
+| `src/ui.js`           | DOM, кнопки, форми, динамічне оновлення     | Поліщук Анна     |
+| `src/storage.js`      | localStorage, збереження всіх даних, сервер | Варенко Катерина |
 
 ## Структура проєкту
 
@@ -29,51 +33,29 @@ bank-app/
   LICENSE
   README.md
   server/
-   index.js
-   users.json
-   data.json
+    index.js
+    users.json
+    data.json
   node_modules/
-   express/
+    express/
 
-bank-app-example/     ← окремий проєкт з прикладами використання
-  index.js
-  package.json
 ```
 
 ## Як запустити
 
-```bash
-git clone https://github.com/linamalina238/bank-app.git
-cd bank-app
-npm run dev
 ```
-
-Відкрити `index.html` у браузері — або використати `npm run dev` якщо встановлено `live-server`.
-
-## Як працювати з Git (для кожного учасника)
-
-```bash
 # 1. Клонувати репозиторій
-git clone https://github.com/linamalina238/bank-app.git
+git clone https://github.com/TEAM/bank-app.git
 cd bank-app
 
-# 2. Створити свою гілку
-git checkout -b feature/storage   # або auth, account, тощо
+# 2. Встановити залежності
+npm install
 
-# 3. Робити зміни у своєму файлі, потім:
-git add src/storage.js
-git commit -m "feat: add saveUser and getBalance functions"
-git push origin feature/storage
-
-# 4. Створити Pull Request на GitHub → main
+# 3. Запустити сервер
+npm start
 ```
 
-## Правила для команди
-
-- Кожен працює **лише у своєму файлі** (`src/твій-файл.js`)
-- Гілки називати: `feature/auth`, `feature/storage`, тощо
-- Коміти писати зрозуміло: `feat:`, `fix:`, `docs:`
-- Перед злиттям — обов'язково Pull Request
+Після цього відкрий `index.html` у браузері. Сервер працює на `http://localhost:3000`.
 
 ## Ліцензія
 
