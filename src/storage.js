@@ -40,3 +40,30 @@ export function getCurrentUser() {
 }
 
 // Транзакції
+export function saveTransaction(transaction) {
+  try {
+    const storedTransactions = localStorage.getItem("bank_transactions");
+    const existingTransactions = storedTransactions
+      ? JSON.parse(storedTransactions)
+      : [];
+    existingTransactions.push(transaction);
+    localStorage.setItem(
+      "bank_transactions",
+      JSON.stringify(existingTransactions),
+    );
+  } catch (error) {
+    console.error("Помилка збереження транзакції", error);
+  }
+}
+
+export function getTransactions() {
+  try {
+    const storedTransactions = localStorage.getItem("bank_transactions");
+    return storedTransactions ? JSON.parse(storedTransactions) : [];
+  } catch (error) {
+    console.error("Помилка читання транзакції", error);
+    return [];
+  }
+}
+
+// Рахунки
