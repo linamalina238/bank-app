@@ -67,3 +67,23 @@ export function getTransactions() {
 }
 
 // Рахунки
+export function saveAccounts(account) {
+  try {
+    const storedAccounts = localStorage.getItem("bank_accounts");
+    const existingAccounts = storedAccounts ? JSON.parse(storedAccounts) : [];
+    existingAccounts.push(account);
+    localStorage.setItem("bank_accounts", JSON.stringify(existingAccounts));
+  } catch (error) {
+    console.error("Помилка збереження рахунку", error);
+  }
+}
+
+export function getAccounts() {
+  try {
+    const storedAccounts = localStorage.getItem("bank_accounts");
+    return storedAccounts ? JSON.parse(storedAccounts) : [];
+  } catch (error) {
+    console.error("Помилка читання рахунку", error);
+    return [];
+  }
+}
