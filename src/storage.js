@@ -7,7 +7,7 @@ export function saveUser(user) {
     existingUsers.push(user);
     localStorage.setItem("bank_users", JSON.stringify(existingUsers));
   } catch (error) {
-    console.error("Помилка збереження користувача:", error);
+    console.error("Помилка збереження користувача", error);
   }
 }
 
@@ -15,7 +15,7 @@ export function saveCurrentUser(user) {
   try {
     localStorage.setItem("bank_current_user", JSON.stringify(user));
   } catch (error) {
-    console.error("Помилка збереження поточного користувача:", error);
+    console.error("Помилка збереження поточного користувача", error);
   }
 }
 
@@ -24,7 +24,7 @@ export function getUsers() {
     const storedUsers = localStorage.getItem("bank_users");
     return storedUsers ? JSON.parse(storedUsers) : [];
   } catch (error) {
-    console.error("Помилка читання користувачів:", error);
+    console.error("Помилка читання користувачів", error);
     return [];
   }
 }
@@ -34,7 +34,7 @@ export function getCurrentUser() {
     const storedUsers = localStorage.getItem("bank_current_user");
     return storedUsers ? JSON.parse(storedUsers) : null;
   } catch (error) {
-    console.error("Помилка читання користувачів:", error);
+    console.error("Помилка читання поточного користувача", error);
     return null;
   }
 }
@@ -85,5 +85,28 @@ export function getAccounts() {
   } catch (error) {
     console.error("Помилка читання рахунку", error);
     return [];
+  }
+}
+
+// Видалення користувача
+export function removeUser(userId) {
+  try {
+    const users = getUsers();
+    const updated = users.filter((user) => user.id !== userId);
+    localStorage.setItem("bank_users", JSON.stringify(updated));
+  } catch (error) {
+    console.error("Помилка видалення користувача", error);
+  }
+}
+
+// Очищення сховища
+export function clearStorage() {
+  try {
+    localStorage.removeItem("bank_users");
+    localStorage.removeItem("bank_current_user");
+    localStorage.removeItem("bank_transactions");
+    localStorage.removeItem("bank_accounts");
+  } catch (error) {
+    console.error("Помилка очищення сховища", error);
   }
 }
