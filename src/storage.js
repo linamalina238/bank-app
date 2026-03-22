@@ -1,3 +1,5 @@
+import { memoize } from "./memoize.js";
+
 // Користувачі
 export function saveUser(user) {
   try {
@@ -19,25 +21,31 @@ export function saveCurrentUser(user) {
   }
 }
 
-export function getUsers() {
-  try {
-    const storedUsers = localStorage.getItem("bank_users");
-    return storedUsers ? JSON.parse(storedUsers) : [];
-  } catch (error) {
-    console.error("Помилка читання користувачів", error);
-    return [];
-  }
-}
+export const getUsers = memoize(
+  function () {
+    try {
+      const storedUsers = localStorage.getItem("bank_users");
+      return storedUsers ? JSON.parse(storedUsers) : [];
+    } catch (error) {
+      console.error("Помилка читання користувачів", error);
+      return [];
+    }
+  },
+  { ttl: 60000 },
+);
 
-export function getCurrentUser() {
-  try {
-    const storedUsers = localStorage.getItem("bank_current_user");
-    return storedUsers ? JSON.parse(storedUsers) : null;
-  } catch (error) {
-    console.error("Помилка читання поточного користувача", error);
-    return null;
-  }
-}
+export const getCurrentUser = memoize(
+  function () {
+    try {
+      const storedUsers = localStorage.getItem("bank_current_user");
+      return storedUsers ? JSON.parse(storedUsers) : null;
+    } catch (error) {
+      console.error("Помилка читання поточного користувача", error);
+      return null;
+    }
+  },
+  { ttl: 60000 },
+);
 
 // Транзакції
 export function saveTransaction(transaction) {
@@ -56,15 +64,18 @@ export function saveTransaction(transaction) {
   }
 }
 
-export function getTransactions() {
-  try {
-    const storedTransactions = localStorage.getItem("bank_transactions");
-    return storedTransactions ? JSON.parse(storedTransactions) : [];
-  } catch (error) {
-    console.error("Помилка читання транзакції", error);
-    return [];
-  }
-}
+export const getTransactions = memoize(
+  function () {
+    try {
+      const storedTransactions = localStorage.getItem("bank_transactions");
+      return storedTransactions ? JSON.parse(storedTransactions) : [];
+    } catch (error) {
+      console.error("Помилка читання транзакції", error);
+      return [];
+    }
+  },
+  { ttl: 60000 },
+);
 
 // Рахунки
 export function saveAccounts(account) {
@@ -78,15 +89,18 @@ export function saveAccounts(account) {
   }
 }
 
-export function getAccounts() {
-  try {
-    const storedAccounts = localStorage.getItem("bank_accounts");
-    return storedAccounts ? JSON.parse(storedAccounts) : [];
-  } catch (error) {
-    console.error("Помилка читання рахунку", error);
-    return [];
-  }
-}
+export const getAccounts = memoize(
+  function () {
+    try {
+      const storedAccounts = localStorage.getItem("bank_accounts");
+      return storedAccounts ? JSON.parse(storedAccounts) : [];
+    } catch (error) {
+      console.error("Помилка читання рахунку", error);
+      return [];
+    }
+  },
+  { ttl: 60000 },
+);
 
 // Видалення користувача
 export function removeUser(userId) {
