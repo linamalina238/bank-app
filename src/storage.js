@@ -1,5 +1,36 @@
 import { memoize } from "./memoize.js";
 
+import { loginUser, registerUser, getInitData } from "./api.js";
+
+export async function loginAndSave(email, password) {
+  const result = await loginUser(email, password);
+
+  if (result.success) {
+    saveCurrentUser(result.user);
+
+    // завантажити початкові дані
+    const data = await getInitData();
+    saveAccounts({ userId: result.user.id, balance: data.balance });
+    data.transactions.forEach((t) => saveTransaction(t));
+  }
+  return result;
+}
+
+import { loginUser, registerUser, getInitData } from "./api.js";
+export async function registerAndSave(name, email, password, phone) {
+  const result = await registerUser(name, email, password, phone);
+
+  if (result.success) {
+    saveCurrentUser(result.user);
+
+    // завантажити початкові дані
+    const data = await getInitData();
+    saveAccounts({ userId: result.user.id, balance: data.balance });
+    data.transactions.forEach((t) => saveTransaction(t));
+  }
+  return result;
+}
+
 // Користувачі
 export function saveUser(user) {
   try {
