@@ -8,46 +8,45 @@
 
 ## Команда та розподіл роботи
 
-
-| Файл                  | Функціонал                                  | Відповідальний   |
-| --------------------- | ------------------------------------------- | ---------------- |
-| `src/auth.js`         | Реєстрація, вхід, перевірка логіна/пароля   |                  |
-| `src/storage.js`      | localStorage, збереження всіх даних, сервер | Варенко Катерина |
-| `src/account.js`      | Рахунок, баланс, поповнення, списання       |                  |
-| `src/transactions.js` | Перекази, історія, категорії витрат         | Лобода Аліна     |
-| `src/ui.js`           | DOM, кнопки, форми, динамічне оновлення     | Поліщук Анна,Сітковська Аліна  |
-| скоро придумаем       | еще чуть чуть и придумаем                   | dima             |
+| Файл                  | Функціонал                                  | Відповідальний                |
+| --------------------- | ------------------------------------------- | ----------------------------- |
+| `src/auth.js`         | Реєстрація, вхід, перевірка логіна/пароля   |                               |
+| `src/storage.js`      | localStorage, збереження всіх даних, сервер | Варенко Катерина              |
+| `src/account.js`      | Рахунок, баланс, поповнення, списання       |                               |
+| `src/transactions.js` | Перекази, історія, категорії витрат         | Лобода Аліна                  |
+| `src/ui.js`           | DOM, кнопки, форми, динамічне оновлення     | Поліщук Анна,Сітковська Аліна |
+| скоро придумаем       | еще чуть чуть и придумаем                   | dima                          |
 
 ## Структура проєкту
 
 ```
 bank-app/
-  src/
-    auth.js
-    account.js
-    transactions.js
-    ui.js
-    storage.js
-    index.js          ← підключає всі модулі разом
-  index.html          ← головна сторінка
-  package.json
-  .gitignore
-  LICENSE
-  README.md
   server/
     index.js
     users.json
     data.json
-  node_modules/
-    express/
-
+  src/
+    account.js
+    api.js
+    auth.js
+    account.js
+    index.js
+    memoize.js
+    storage.js
+    transactions.js
+    ui.js
+  .gitignore
+  index.html
+  LICENSE
+  package.json
+  README.md
 ```
 
 ## Як запустити
 
 ```
 # 1. Клонувати репозиторій
-git clone https://github.com/TEAM/bank-app.git
+git clone https://github.com/linamalina238/bank-app.git
 cd bank-app
 
 # 2. Встановити залежності
@@ -57,8 +56,8 @@ npm install
 npm start
 ```
 
-Після цього відкрий `index.html` у браузері. Сервер працює на `http://localhost:3000`.
+Після цього відкрити `index.html` у браузері. Сервер працює на `http://localhost:3000`.
 
 ## Ліцензія
 
-MIT — дивись файл [LICENSE](./LICENSE)
+MIT — переглянути файл [LICENSE](./LICENSE)
