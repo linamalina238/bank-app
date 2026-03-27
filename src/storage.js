@@ -16,7 +16,6 @@ export async function loginAndSave(email, password) {
   return result;
 }
 
-import { loginUser, registerUser, getInitData } from "./api.js";
 export async function registerAndSave(name, email, password, phone) {
   const result = await registerUser(name, email, password, phone);
 
