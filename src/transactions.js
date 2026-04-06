@@ -1,7 +1,19 @@
 import { getAccounts, getCurrentUser, saveTransaction, getTransactions } from "./storage.js";
 
-// Переказ іншому користувачу
+// Переказ
 export function transfer(toUserId, amount, category = "переказ") {
+  if (!toUserId) {
+    console.error("Отримувач не вказаний");
+    return false;
+  }
+  if (!amount && amount !== 0) {
+    console.error("Сума не може бути порожньою");
+    return false;
+  }
+  if (typeof amount !== "number") {
+    console.error("Сума має бути числом");
+    return false;
+  }
   if (amount <= 0) {
     console.error("Сума має бути більше 0");
     return false;
@@ -10,10 +22,19 @@ export function transfer(toUserId, amount, category = "переказ") {
   const currentUser = getCurrentUser();
   if (!currentUser) return false;
 
+  if (toUserId === currentUser.id) {
+    console.error("Не можна переказати самому собі");
+    return false;
+  }
+
   const accounts = getAccounts();
   const myAccount = accounts.find(acc => acc.userId === currentUser.id);
   const toAccount = accounts.find(acc => acc.userId === toUserId);
 
+  if (!myAccount) {
+    console.error("Ваш рахунок не знайдено");
+    return false;
+  }
   if (!toAccount) {
     console.error("Отримувача не знайдено");
     return false;
@@ -23,15 +44,14 @@ export function transfer(toUserId, amount, category = "переказ") {
     return false;
   }
 
-  // Оновлюємо баланси обох
   const updated = accounts.map(acc => {
     if (acc.userId === currentUser.id) return { ...acc, balance: acc.balance - amount };
     if (acc.userId === toUserId) return { ...acc, balance: acc.balance + amount };
     return acc;
   });
+
   localStorage.setItem("bank_accounts", JSON.stringify(updated));
 
-  // Зберігаємо в історію
   saveTransaction({
     id: Date.now(),
     fromId: currentUser.id,
@@ -44,7 +64,7 @@ export function transfer(toUserId, amount, category = "переказ") {
   return true;
 }
 
-// Історія транзакцій поточного користувача
+// Історія транзакцій
 export function getHistory() {
   const currentUser = getCurrentUser();
   if (!currentUser) return [];
@@ -55,5 +75,9 @@ export function getHistory() {
 
 // Фільтр за категорією
 export function getByCategory(category) {
+  if (!category) {
+    console.error("Категорія не вказана");
+    return [];
+  }
   return getHistory().filter(t => t.category === category);
 }

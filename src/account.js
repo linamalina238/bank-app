@@ -1,4 +1,4 @@
-import { getAccounts, getCurrentUser, saveAccounts } from "./storage.js";
+import { getAccounts, getCurrentUser } from "./storage.js";
 
 // Баланс
 export function getBalance() {
@@ -7,14 +7,21 @@ export function getBalance() {
 
   const accounts = getAccounts();
   const myAccount = accounts.find(acc => acc.userId === currentUser.id);
-
   return myAccount ? myAccount.balance : 0;
 }
 
 // Поповнення
 export function deposit(amount) {
+  if (typeof amount !== "number") {
+    console.error("Сума має бути числом");
+    return false;
+  }
   if (amount <= 0) {
     console.error("Сума має бути більше 0");
+    return false;
+  }
+  if (amount > 1000000) {
+    console.error("Сума не може перевищувати 1,000,000");
     return false;
   }
 
@@ -22,12 +29,11 @@ export function deposit(amount) {
   if (!currentUser) return false;
 
   const accounts = getAccounts();
-  const updated = accounts.map(acc => {
-    if (acc.userId === currentUser.id) {
-      return { ...acc, balance: acc.balance + amount };
-    }
-    return acc;
-  });
+  const updated = accounts.map(acc =>
+    acc.userId === currentUser.id
+      ? { ...acc, balance: acc.balance + amount }
+      : acc
+  );
 
   localStorage.setItem("bank_accounts", JSON.stringify(updated));
   return true;
@@ -35,6 +41,10 @@ export function deposit(amount) {
 
 // Списання
 export function withdraw(amount) {
+  if (typeof amount !== "number") {
+    console.error("Сума має бути числом");
+    return false;
+  }
   if (amount <= 0) {
     console.error("Сума має бути більше 0");
     return false;
@@ -47,29 +57,30 @@ export function withdraw(amount) {
   const myAccount = accounts.find(acc => acc.userId === currentUser.id);
 
   if (!myAccount) return false;
-
   if (myAccount.balance < amount) {
     console.error("Недостатньо коштів");
     return false;
   }
 
-  const updated = accounts.map(acc => {
-    if (acc.userId === currentUser.id) {
-      return { ...acc, balance: acc.balance - amount };
-    }
-    return acc;
-  });
+  const updated = accounts.map(acc =>
+    acc.userId === currentUser.id
+      ? { ...acc, balance: acc.balance - amount }
+      : acc
+  );
 
   localStorage.setItem("bank_accounts", JSON.stringify(updated));
   return true;
 }
 
-// Створити рахунок для нового користувача
+// Створити рахунок
 export function createAccount(userId) {
-  const accounts = getAccounts();
+  if (!userId) {
+    console.error("userId не може бути порожнім");
+    return false;
+  }
 
-  const already = accounts.find(acc => acc.userId === userId);
-  if (already) {
+  const accounts = getAccounts();
+  if (accounts.find(acc => acc.userId === userId)) {
     console.error("Рахунок вже існує");
     return false;
   }
@@ -80,12 +91,11 @@ export function createAccount(userId) {
     balance: 0
   };
 
-  accounts.push(newAccount);
-  localStorage.setItem("bank_accounts", JSON.stringify(accounts));
+  localStorage.setItem("bank_accounts", JSON.stringify([...accounts, newAccount]));
   return newAccount;
 }
 
-// Отримати інфо про рахунок поточного користувача
+// Отримати рахунок поточного користувача
 export function getAccount() {
   const currentUser = getCurrentUser();
   if (!currentUser) return null;
@@ -94,8 +104,9 @@ export function getAccount() {
   return accounts.find(acc => acc.userId === currentUser.id) || null;
 }
 
-// Перевірити чи є рахунок у користувача
+// Перевірити чи є рахунок
 export function hasAccount(userId) {
+  if (!userId) return false;
   const accounts = getAccounts();
   return accounts.some(acc => acc.userId === userId);
 }
@@ -106,12 +117,11 @@ export function resetBalance() {
   if (!currentUser) return false;
 
   const accounts = getAccounts();
-  const updated = accounts.map(acc => {
-    if (acc.userId === currentUser.id) {
-      return { ...acc, balance: 0 };
-    }
-    return acc;
-  });
+  const updated = accounts.map(acc =>
+    acc.userId === currentUser.id
+      ? { ...acc, balance: 0 }
+      : acc
+  );
 
   localStorage.setItem("bank_accounts", JSON.stringify(updated));
   return true;
