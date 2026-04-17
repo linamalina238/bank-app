@@ -27,4 +27,10 @@ export function memoize(fn, options = {}) {
     cacheSize++;
     return result;
   };
+
+  memoize.clear = () => {
+    Object.keys(cache).forEach((key) => delete cache[key]);
+    cacheSize = 0;
+  };
+  return memoize;
 }

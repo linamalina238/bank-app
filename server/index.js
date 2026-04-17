@@ -21,10 +21,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.listen(PORT, () => {
-  console.log(`Сервер працює на http://localhost:${PORT}`);
-});
-
 //Обробка запиту на реєстрацію нового користувача
 app.post("/register", (req, res) => {
   const { name, email, password, phone } = req.body;
@@ -37,7 +33,7 @@ app.post("/register", (req, res) => {
 
   // Додавання нового користувача
   const newUser = {
-    id: String(users.length + 1),
+    id: Date.now().toString(),
     name,
     email,
     password,
@@ -79,4 +75,8 @@ app.post("/login", (req, res) => {
 //Обробка запиту на отримання даних
 app.get("/init-data", (req, res) => {
   res.json(data);
+});
+
+app.listen(PORT, () => {
+  console.log(`Сервер працює на http://localhost:${PORT}`);
 });
