@@ -1,6 +1,6 @@
 import { memoize } from "./memoize.js";
-
 import { loginUser, registerUser, getInitData } from "./api.js";
+import { eventBus } from "./eventBus.js";
 
 async function successAuth(user) {
   saveCurrentUser(user);
@@ -9,6 +9,8 @@ async function successAuth(user) {
 
   saveAccounts({ userId: user.id, balance: data.balance });
   data.transactions.forEach((t) => saveTransaction(t));
+
+  eventBus.emit("user:login", user);
 }
 
 export async function loginAndSave(email, password) {
@@ -80,6 +82,8 @@ export function saveTransaction(transaction) {
     );
 
     getTransactions.clear();
+
+    eventBus.emit("transactions:updated", existingTransactions);
   } catch (error) {
     console.error("Помилка збереження транзакції", error);
   }
@@ -107,6 +111,8 @@ export function saveAccounts(account) {
     localStorage.setItem("bank_accounts", JSON.stringify(existingAccounts));
 
     getAccounts.clear();
+
+    eventBus.emit("accounts:updated", existingAccounts);
   } catch (error) {
     console.error("Помилка збереження рахунку", error);
   }
@@ -150,6 +156,8 @@ export function clearStorage() {
     getCurrentUser.clear();
     getTransactions.clear();
     getAccounts.clear();
+
+    eventBus.emit("user:logout");
   } catch (error) {
     console.error("Помилка очищення сховища", error);
   }
