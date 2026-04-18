@@ -22,6 +22,7 @@
     "coursework"
   ],
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "express": "^5.2.1"
   }
 }

@@ -1,8 +1,9 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const users = require("./users.json");
+let users = require("./users.json");
 const data = require("./data.json");
+const bcrypt = require("bcrypt");
 
 const app = express();
 app.use(express.json());
@@ -11,7 +12,7 @@ const PORT = 3000;
 // CORS middleware
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Methods", "GET, POST");
 
   if (req.method === "OPTIONS") {
@@ -22,7 +23,7 @@ app.use((req, res, next) => {
 });
 
 //Обробка запиту на реєстрацію нового користувача
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
   const { name, email, password, phone } = req.body;
   if (users.find((u) => u.email === email)) {
     return res.status(400).json({
@@ -31,12 +32,13 @@ app.post("/register", (req, res) => {
     });
   }
 
+  const hashedPassword = await bcrypt.hash(password, 10);
   // Додавання нового користувача
   const newUser = {
     id: Date.now().toString(),
     name,
     email,
-    password,
+    password: hashedPassword,
     phone,
   };
 
@@ -47,29 +49,39 @@ app.post("/register", (req, res) => {
     JSON.stringify(users, null, 2),
   );
 
+  const { password: _, ...safeUser } = newUser;
   res.json({
     success: true,
     message: "Користувач успішно зареєстрований",
-    user: newUser,
+    user: safeUser,
   });
 });
 
 //Обробка запиту на вхід користувача
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const user = users.find((u) => u.email === email && u.password === password);
-  if (user) {
-    res.json({
-      success: true,
-      message: "Успішний вхід",
-      user,
-    });
-  } else {
-    res.status(401).json({
+  const user = users.find((u) => u.email === email);
+  if (!user) {
+    return res.status(401).json({
       success: false,
       message: "Невірна пошта або пароль",
     });
   }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(401).json({
+      success: false,
+      message: "Невірна пошта або пароль",
+    });
+  }
+
+  const { password: _, ...safeUser } = user;
+  res.json({
+    success: true,
+    message: "Вхід успішний",
+    user: safeUser,
+  });
 });
 
 //Обробка запиту на отримання даних
