@@ -47,3 +47,11 @@ export function logout() {
   localStorage.removeItem("bank_user");
   console.log("User logged out");
 }
+
+export function getCurrentUser() {
+  const user = localStorage.getItem("bank_user");
+  if (user) {
+    return JSON.parse(user);
+  }
+  return null;
+}
