@@ -4,6 +4,9 @@ const path = require("path");
 let users = require("./users.json");
 const data = require("./data.json");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const JWT_SECRET = "secret_key";
 
 const app = express();
 app.use(express.json());
@@ -32,7 +35,12 @@ app.post("/register", async (req, res) => {
     });
   }
 
+  const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, {
+    expiresIn: "1h",
+  });
+
   const hashedPassword = await bcrypt.hash(password, 10);
+
   // Додавання нового користувача
   const newUser = {
     id: Date.now().toString(),
@@ -76,16 +84,42 @@ app.post("/login", async (req, res) => {
     });
   }
 
+  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+
   const { password: _, ...safeUser } = user;
   res.json({
     success: true,
     message: "Вхід успішний",
     user: safeUser,
+    token,
   });
 });
 
+// Middleware для перевірки авторизації
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({
+      success: false,
+      message: "Необхідно авторизуватися",
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: "Невірний токен",
+    });
+  }
+}
+
 //Обробка запиту на отримання даних
-app.get("/init-data", (req, res) => {
+app.get("/init-data", authMiddleware, (req, res) => {
   res.json(data);
 });
 
