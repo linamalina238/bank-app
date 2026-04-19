@@ -2,8 +2,10 @@ import { memoize } from "./memoize.js";
 import { loginUser, registerUser, getInitData } from "./api.js";
 import { eventBus } from "./eventBus.js";
 
-async function successAuth(user) {
+async function successAuth(user, token) {
   saveCurrentUser(user);
+
+  localStorage.setItem("token", token);
 
   const data = await getInitData();
 
@@ -17,7 +19,7 @@ export async function loginAndSave(email, password) {
   const result = await loginUser(email, password);
 
   if (result.success) {
-    await successAuth(result.user);
+    await successAuth(result.user, result.token);
   }
   return result;
 }
@@ -26,7 +28,7 @@ export async function registerAndSave(name, email, password, phone) {
   const result = await registerUser(name, email, password, phone);
 
   if (result.success) {
-    await successAuth(result.user);
+    await successAuth(result.user, result.token);
   }
   return result;
 }

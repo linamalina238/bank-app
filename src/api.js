@@ -19,6 +19,9 @@ export async function registerUser(name, email, password, phone) {
 }
 
 export async function getInitData() {
-  const response = await fetch(`${API_URL}/init-data`);
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${API_URL}/init-data`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.json();
 }

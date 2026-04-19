@@ -7,12 +7,19 @@ class EventBus {
     if (!this.events[event]) {
       this.events[event] = [];
     }
-
     this.events[event].push(listener);
 
     return () => {
       this.events[event] = this.events[event].filter((l) => l !== listener);
     };
+  }
+
+  once(event, listener) {
+    const wrapper = (data) => {
+      listener(data);
+      this.events[event] = this.events[event].filter((l) => l !== wrapper);
+    };
+    this.subscribe(event, wrapper);
   }
 
   emit(event, data) {

@@ -6,7 +6,7 @@ const data = require("./data.json");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = "secret_key";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const app = express();
 app.use(express.json());
@@ -35,10 +35,6 @@ app.post("/register", async (req, res) => {
     });
   }
 
-  const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, {
-    expiresIn: "1h",
-  });
-
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Додавання нового користувача
@@ -49,6 +45,10 @@ app.post("/register", async (req, res) => {
     password: hashedPassword,
     phone,
   };
+
+  const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
   users.push(newUser);
 
@@ -62,6 +62,7 @@ app.post("/register", async (req, res) => {
     success: true,
     message: "Користувач успішно зареєстрований",
     user: safeUser,
+    token,
   });
 });
 
@@ -84,7 +85,9 @@ app.post("/login", async (req, res) => {
     });
   }
 
-  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
   const { password: _, ...safeUser } = user;
   res.json({
@@ -102,6 +105,13 @@ function authMiddleware(req, res, next) {
     return res.status(401).json({
       success: false,
       message: "Необхідно авторизуватися",
+    });
+  }
+
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      success: false,
+      message: "Невірний формат токена",
     });
   }
 
