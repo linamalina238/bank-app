@@ -1,27 +1,39 @@
 const API_URL = "http://localhost:3000";
 
 export async function loginUser(email, password) {
-  const response = await fetch(`${API_URL}/login`, {
+  return apiRequest("/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  return response.json();
 }
 
 export async function registerUser(name, email, password, phone) {
-  const response = await fetch(`${API_URL}/register`, {
+  return apiRequest("/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, email, password, phone }),
   });
-  return response.json();
 }
 
 export async function getInitData() {
+  return apiRequest("/init-data");
+}
+
+async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("token");
-  const response = await fetch(`${API_URL}/init-data`, {
-    headers: { Authorization: `Bearer ${token}` },
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers,
   });
+
   return response.json();
 }
