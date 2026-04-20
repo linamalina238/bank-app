@@ -6,6 +6,7 @@ let users = require("./users.json");
 const data = require("./data.json");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { log } = require("../src/logger");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -27,77 +28,87 @@ app.use((req, res, next) => {
 });
 
 //Обробка запиту на реєстрацію нового користувача
-app.post("/register", async (req, res) => {
-  const { name, email, password, phone } = req.body;
-  if (users.find((u) => u.email === email)) {
-    return res.status(400).json({
-      success: false,
-      message: "Користувач з такою поштою вже існує",
+app.post(
+  "/register",
+  log({ level: "INFO" })(async (req, res) => {
+    const { name, email, password, phone } = req.body;
+    if (users.find((u) => u.email === email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Користувач з такою поштою вже існує",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Додавання нового користувача
+    const newUser = {
+      id: Date.now().toString(),
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+    };
+
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email },
+      JWT_SECRET,
+      {
+        expiresIn: "1h",
+      },
+    );
+
+    users.push(newUser);
+
+    fs.writeFileSync(
+      path.join(__dirname, "users.json"),
+      JSON.stringify(users, null, 2),
+    );
+
+    const { password: _, ...safeUser } = newUser;
+    res.json({
+      success: true,
+      message: "Користувач успішно зареєстрований",
+      user: safeUser,
+      token,
     });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // Додавання нового користувача
-  const newUser = {
-    id: Date.now().toString(),
-    name,
-    email,
-    password: hashedPassword,
-    phone,
-  };
-
-  const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, {
-    expiresIn: "1h",
-  });
-
-  users.push(newUser);
-
-  fs.writeFileSync(
-    path.join(__dirname, "users.json"),
-    JSON.stringify(users, null, 2),
-  );
-
-  const { password: _, ...safeUser } = newUser;
-  res.json({
-    success: true,
-    message: "Користувач успішно зареєстрований",
-    user: safeUser,
-    token,
-  });
-});
+  }),
+);
 
 //Обробка запиту на вхід користувача
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const user = users.find((u) => u.email === email);
-  if (!user) {
-    return res.status(401).json({
-      success: false,
-      message: "Невірна пошта або пароль",
+app.post(
+  "/login",
+  log({ level: "INFO" })(async (req, res) => {
+    const { email, password } = req.body;
+    const user = users.find((u) => u.email === email);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Невірна пошта або пароль",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Невірна пошта або пароль",
+      });
+    }
+
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+      expiresIn: "1h",
     });
-  }
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return res.status(401).json({
-      success: false,
-      message: "Невірна пошта або пароль",
+    const { password: _, ...safeUser } = user;
+    res.json({
+      success: true,
+      message: "Вхід успішний",
+      user: safeUser,
+      token,
     });
-  }
-
-  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-    expiresIn: "1h",
-  });
-
-  const { password: _, ...safeUser } = user;
-  res.json({
-    success: true,
-    message: "Вхід успішний",
-    user: safeUser,
-    token,
-  });
-});
+  }),
+);
 
 // Middleware для перевірки авторизації
 function authMiddleware(req, res, next) {
@@ -130,9 +141,13 @@ function authMiddleware(req, res, next) {
 }
 
 //Обробка запиту на отримання даних
-app.get("/init-data", authMiddleware, (req, res) => {
-  res.json(data);
-});
+app.get(
+  "/init-data",
+  authMiddleware,
+  log({ level: "INFO" })(async (req, res) => {
+    res.json(data);
+  }),
+);
 
 app.listen(PORT, () => {
   console.log(`Сервер працює на http://localhost:${PORT}`);
