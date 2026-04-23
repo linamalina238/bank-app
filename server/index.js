@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { log } = require("../src/logger");
 
-const JWT_SECRET = process.env.JWT_SECRET || "super_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const app = express();
 app.use(express.json());
@@ -43,7 +43,7 @@ function generateToken(req, user) {
   );
 }
 
-function validateToken(token) {
+function validateToken(token, req) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     if (
@@ -144,8 +144,15 @@ function authMiddleware(req, res, next) {
     });
   }
 
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      success: false,
+      message: "Невірний формат токена",
+    });
+  }
+
   const token = authHeader.split(" ")[1];
-  const decoded = validateToken(token);
+  const decoded = validateToken(token, req);
 
   if (!decoded) {
     return res.status(401).json({
