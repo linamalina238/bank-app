@@ -8,11 +8,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { log } = require("../src/logger");
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || "super_secret_key";
 
 const app = express();
 app.use(express.json());
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // CORS middleware
 app.use((req, res, next) => {
@@ -26,6 +26,38 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// Генерація JWT токена
+function generateToken(req, user) {
+  return jwt.sign(
+    {
+      auth: "bank_app",
+      id: user.id,
+      email: user.email,
+      agent: req.headers["user-agent"],
+    },
+    JWT_SECRET,
+    {
+      expiresIn: "1h",
+    },
+  );
+}
+
+function validateToken(token) {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (
+      !decoded ||
+      decoded.auth !== "bank_app" ||
+      decoded.agent !== req.headers["user-agent"]
+    ) {
+      return null;
+    }
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+}
 
 //Обробка запиту на реєстрацію нового користувача
 app.post(
@@ -50,13 +82,7 @@ app.post(
       phone,
     };
 
-    const token = jwt.sign(
-      { id: newUser.id, email: newUser.email },
-      JWT_SECRET,
-      {
-        expiresIn: "1h",
-      },
-    );
+    const token = generateToken(req, newUser);
 
     users.push(newUser);
 
@@ -96,9 +122,7 @@ app.post(
       });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = generateToken(req, user);
 
     const { password: _, ...safeUser } = user;
     res.json({
@@ -120,24 +144,18 @@ function authMiddleware(req, res, next) {
     });
   }
 
-  if (!authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({
-      success: false,
-      message: "Невірний формат токена",
-    });
-  }
-
   const token = authHeader.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
+  const decoded = validateToken(token);
+
+  if (!decoded) {
     return res.status(401).json({
       success: false,
       message: "Невірний токен",
     });
   }
+
+  req.user = decoded;
+  next();
 }
 
 //Обробка запиту на отримання даних

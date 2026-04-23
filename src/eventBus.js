@@ -4,14 +4,13 @@ class EventBus {
   }
 
   subscribe(event, listener) {
-    if (!this.events[event]) {
-      this.events[event] = [];
-    }
+    !this.events[event] && (this.events[event] = []);
     this.events[event].push(listener);
+  }
 
-    return () => {
-      this.events[event] = this.events[event].filter((l) => l !== listener);
-    };
+  unsubscribe(event, listener) {
+    if (!this.events[event]) return;
+    this.events[event] = this.events[event].filter((l) => l !== listener);
   }
 
   once(event, listener) {
@@ -23,9 +22,10 @@ class EventBus {
   }
 
   emit(event, data) {
-    if (this.events[event]) {
-      this.events[event].forEach((listener) => listener(data));
-    }
+    const listeners = this.events[event];
+
+    if (!listeners) return;
+    listeners.forEach((listener) => listener.call(null, data));
   }
 }
 

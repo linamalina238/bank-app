@@ -5,14 +5,32 @@ import { eventBus } from "./eventBus.js";
 async function successAuth(user, token) {
   saveCurrentUser(user);
 
-  localStorage.setItem("token", token);
+  if (token) {
+    localStorage.setItem("token", token);
+  }
 
-  const data = await getInitData();
+  try {
+    const data = await getInitData();
+    if (!data || !data.transactions) return;
 
-  saveAccounts({ userId: user.id, balance: data.balance });
-  data.transactions.forEach((t) => saveTransaction(t));
+    localStorage.setItem(
+      "bank_accounts",
+      JSON.stringify([{ userId: user.id, balance: data.balance }]),
+    );
 
-  eventBus.emit("user:login", user);
+    localStorage.setItem(
+      "bank_transactions",
+      JSON.stringify(data.transactions),
+    );
+
+    eventBus.emit("init:data", data);
+    eventBus.emit("user:login", user);
+
+    getAccounts.clear();
+    getTransactions.clear();
+  } catch (error) {
+    console.error("Помилка отримання початкових даних", error);
+  }
 }
 
 export async function loginAndSave(email, password) {
@@ -44,24 +62,11 @@ export function saveCurrentUser(user) {
   }
 }
 
-export const getUsers = memoize(
-  function () {
-    try {
-      const storedUsers = localStorage.getItem("bank_users");
-      return storedUsers ? JSON.parse(storedUsers) : [];
-    } catch (error) {
-      console.error("Помилка читання користувачів", error);
-      return [];
-    }
-  },
-  { ttl: 60000 },
-);
-
 export const getCurrentUser = memoize(
   function () {
     try {
-      const storedUsers = localStorage.getItem("bank_current_user");
-      return storedUsers ? JSON.parse(storedUsers) : null;
+      const storedUser = localStorage.getItem("bank_current_user");
+      return storedUser ? JSON.parse(storedUser) : null;
     } catch (error) {
       console.error("Помилка читання поточного користувача", error);
       return null;
@@ -71,13 +76,13 @@ export const getCurrentUser = memoize(
 );
 
 // Транзакції
-export function saveTransaction(transaction) {
+export function saveTransaction(newTransaction) {
   try {
     const storedTransactions = localStorage.getItem("bank_transactions");
     const existingTransactions = storedTransactions
       ? JSON.parse(storedTransactions)
       : [];
-    existingTransactions.push(transaction);
+    existingTransactions.push(newTransaction);
     localStorage.setItem(
       "bank_transactions",
       JSON.stringify(existingTransactions),
@@ -105,16 +110,20 @@ export const getTransactions = memoize(
 );
 
 // Рахунки
-export function saveAccounts(account) {
+export function saveAccounts(updatedAccount) {
   try {
     const storedAccounts = localStorage.getItem("bank_accounts");
     const existingAccounts = storedAccounts ? JSON.parse(storedAccounts) : [];
-    existingAccounts.push(account);
-    localStorage.setItem("bank_accounts", JSON.stringify(existingAccounts));
+    const updatedAccounts = existingAccounts.filter(
+      (acc) => acc.userId !== updatedAccount.userId,
+    );
+    updatedAccounts.push(updatedAccount);
+
+    localStorage.setItem("bank_accounts", JSON.stringify(updatedAccounts));
 
     getAccounts.clear();
 
-    eventBus.emit("accounts:updated", existingAccounts);
+    eventBus.emit("accounts:updated", updatedAccounts);
   } catch (error) {
     console.error("Помилка збереження рахунку", error);
   }
@@ -133,19 +142,6 @@ export const getAccounts = memoize(
   { ttl: 60000 },
 );
 
-// Видалення користувача
-export function removeUser(userId) {
-  try {
-    const users = getUsers();
-    const updated = users.filter((user) => user.id !== userId);
-    localStorage.setItem("bank_users", JSON.stringify(updated));
-
-    getUsers.clear();
-  } catch (error) {
-    console.error("Помилка видалення користувача", error);
-  }
-}
-
 // Очищення сховища
 export function clearStorage() {
   try {
@@ -153,8 +149,8 @@ export function clearStorage() {
     localStorage.removeItem("bank_current_user");
     localStorage.removeItem("bank_transactions");
     localStorage.removeItem("bank_accounts");
+    localStorage.removeItem("token");
 
-    getUsers.clear();
     getCurrentUser.clear();
     getTransactions.clear();
     getAccounts.clear();
