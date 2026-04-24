@@ -1,17 +1,33 @@
 import { memoize } from "./memoize.js";
-
 import { loginUser, registerUser, getInitData } from "./api.js";
+import { eventBus } from "./eventBus.js";
+
+async function successAuth(user, token) {
+  saveCurrentUser(user);
+
+  if (token) {
+    localStorage.setItem("token", token);
+  }
+
+  try {
+    const data = await getInitData();
+    if (!data || !data.transactions) return;
+
+    setAccounts([{ userId: user.id, balance: data.balance }]);
+    setTransactions(data.transactions);
+
+    eventBus.emit("init:data", data);
+    eventBus.emit("user:login", user);
+  } catch (error) {
+    console.error("Помилка отримання початкових даних", error);
+  }
+}
 
 export async function loginAndSave(email, password) {
   const result = await loginUser(email, password);
 
   if (result.success) {
-    saveCurrentUser(result.user);
-
-    // завантажити початкові дані
-    const data = await getInitData();
-    saveAccounts({ userId: result.user.id, balance: data.balance });
-    data.transactions.forEach((t) => saveTransaction(t));
+    await successAuth(result.user, result.token);
   }
   return result;
 }
@@ -20,55 +36,27 @@ export async function registerAndSave(name, email, password, phone) {
   const result = await registerUser(name, email, password, phone);
 
   if (result.success) {
-    saveCurrentUser(result.user);
-
-    // завантажити початкові дані
-    const data = await getInitData();
-    saveAccounts({ userId: result.user.id, balance: data.balance });
-    data.transactions.forEach((t) => saveTransaction(t));
+    await successAuth(result.user, result.token);
   }
   return result;
 }
 
 // Користувачі
-export function saveUser(user) {
-  try {
-    const storedUsers = localStorage.getItem("bank_users");
-    const existingUsers = storedUsers ? JSON.parse(storedUsers) : [];
-
-    existingUsers.push(user);
-    localStorage.setItem("bank_users", JSON.stringify(existingUsers));
-  } catch (error) {
-    console.error("Помилка збереження користувача", error);
-  }
-}
-
 export function saveCurrentUser(user) {
   try {
     localStorage.setItem("bank_current_user", JSON.stringify(user));
+
+    getCurrentUser.clear();
   } catch (error) {
     console.error("Помилка збереження поточного користувача", error);
   }
 }
 
-export const getUsers = memoize(
-  function () {
-    try {
-      const storedUsers = localStorage.getItem("bank_users");
-      return storedUsers ? JSON.parse(storedUsers) : [];
-    } catch (error) {
-      console.error("Помилка читання користувачів", error);
-      return [];
-    }
-  },
-  { ttl: 60000 },
-);
-
 export const getCurrentUser = memoize(
   function () {
     try {
-      const storedUsers = localStorage.getItem("bank_current_user");
-      return storedUsers ? JSON.parse(storedUsers) : null;
+      const storedUser = localStorage.getItem("bank_current_user");
+      return storedUser ? JSON.parse(storedUser) : null;
     } catch (error) {
       console.error("Помилка читання поточного користувача", error);
       return null;
@@ -78,20 +66,10 @@ export const getCurrentUser = memoize(
 );
 
 // Транзакції
-export function saveTransaction(transaction) {
-  try {
-    const storedTransactions = localStorage.getItem("bank_transactions");
-    const existingTransactions = storedTransactions
-      ? JSON.parse(storedTransactions)
-      : [];
-    existingTransactions.push(transaction);
-    localStorage.setItem(
-      "bank_transactions",
-      JSON.stringify(existingTransactions),
-    );
-  } catch (error) {
-    console.error("Помилка збереження транзакції", error);
-  }
+export function setTransactions(transactions) {
+  localStorage.setItem("bank_transactions", JSON.stringify(transactions));
+  getTransactions.clear();
+  eventBus.emit("transactions:updated", transactions);
 }
 
 export const getTransactions = memoize(
@@ -108,15 +86,10 @@ export const getTransactions = memoize(
 );
 
 // Рахунки
-export function saveAccounts(account) {
-  try {
-    const storedAccounts = localStorage.getItem("bank_accounts");
-    const existingAccounts = storedAccounts ? JSON.parse(storedAccounts) : [];
-    existingAccounts.push(account);
-    localStorage.setItem("bank_accounts", JSON.stringify(existingAccounts));
-  } catch (error) {
-    console.error("Помилка збереження рахунку", error);
-  }
+export function setAccounts(accounts) {
+  localStorage.setItem("bank_accounts", JSON.stringify(accounts));
+  getAccounts.clear();
+  eventBus.emit("accounts:updated", accounts);
 }
 
 export const getAccounts = memoize(
@@ -132,17 +105,6 @@ export const getAccounts = memoize(
   { ttl: 60000 },
 );
 
-// Видалення користувача
-export function removeUser(userId) {
-  try {
-    const users = getUsers();
-    const updated = users.filter((user) => user.id !== userId);
-    localStorage.setItem("bank_users", JSON.stringify(updated));
-  } catch (error) {
-    console.error("Помилка видалення користувача", error);
-  }
-}
-
 // Очищення сховища
 export function clearStorage() {
   try {
@@ -150,6 +112,13 @@ export function clearStorage() {
     localStorage.removeItem("bank_current_user");
     localStorage.removeItem("bank_transactions");
     localStorage.removeItem("bank_accounts");
+    localStorage.removeItem("token");
+
+    getCurrentUser.clear();
+    getTransactions.clear();
+    getAccounts.clear();
+
+    eventBus.emit("user:logout");
   } catch (error) {
     console.error("Помилка очищення сховища", error);
   }

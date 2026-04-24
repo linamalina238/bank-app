@@ -1,24 +1,60 @@
 const API_URL = "http://localhost:3000";
 
 export async function loginUser(email, password) {
-  const response = await fetch(`${API_URL}/login`, {
+  return apiRequest("/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  return response.json();
 }
 
 export async function registerUser(name, email, password, phone) {
-  const response = await fetch(`${API_URL}/register`, {
+  return apiRequest("/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, email, password, phone }),
   });
-  return response.json();
 }
 
 export async function getInitData() {
-  const response = await fetch(`${API_URL}/init-data`);
+  return apiRequest("/init-data");
+}
+
+export async function depositRequest(amount) {
+  return apiRequest("/deposit", {
+    method: "POST",
+    body: JSON.stringify({ amount }),
+  });
+}
+
+export async function withdrawRequest(amount) {
+  return apiRequest("/withdraw", {
+    method: "POST",
+    body: JSON.stringify({ amount }),
+  });
+}
+
+export async function transferRequest(toUserId, amount) {
+  return apiRequest("/transfer", {
+    method: "POST",
+    body: JSON.stringify({ toUserId, amount }),
+  });
+}
+
+async function apiRequest(endpoint, options = {}) {
+  const token = localStorage.getItem("token");
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
   return response.json();
 }
