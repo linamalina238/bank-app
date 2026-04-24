@@ -13,21 +13,11 @@ async function successAuth(user, token) {
     const data = await getInitData();
     if (!data || !data.transactions) return;
 
-    localStorage.setItem(
-      "bank_accounts",
-      JSON.stringify([{ userId: user.id, balance: data.balance }]),
-    );
-
-    localStorage.setItem(
-      "bank_transactions",
-      JSON.stringify(data.transactions),
-    );
+    setAccounts([{ userId: user.id, balance: data.balance }]);
+    setTransactions(data.transactions);
 
     eventBus.emit("init:data", data);
     eventBus.emit("user:login", user);
-
-    getAccounts.clear();
-    getTransactions.clear();
   } catch (error) {
     console.error("Помилка отримання початкових даних", error);
   }
@@ -76,24 +66,10 @@ export const getCurrentUser = memoize(
 );
 
 // Транзакції
-export function saveTransaction(newTransaction) {
-  try {
-    const storedTransactions = localStorage.getItem("bank_transactions");
-    const existingTransactions = storedTransactions
-      ? JSON.parse(storedTransactions)
-      : [];
-    existingTransactions.push(newTransaction);
-    localStorage.setItem(
-      "bank_transactions",
-      JSON.stringify(existingTransactions),
-    );
-
-    getTransactions.clear();
-
-    eventBus.emit("transactions:updated", existingTransactions);
-  } catch (error) {
-    console.error("Помилка збереження транзакції", error);
-  }
+export function setTransactions(transactions) {
+  localStorage.setItem("bank_transactions", JSON.stringify(transactions));
+  getTransactions.clear();
+  eventBus.emit("transactions:updated", transactions);
 }
 
 export const getTransactions = memoize(
@@ -110,23 +86,10 @@ export const getTransactions = memoize(
 );
 
 // Рахунки
-export function saveAccounts(updatedAccount) {
-  try {
-    const storedAccounts = localStorage.getItem("bank_accounts");
-    const existingAccounts = storedAccounts ? JSON.parse(storedAccounts) : [];
-    const updatedAccounts = existingAccounts.filter(
-      (acc) => acc.userId !== updatedAccount.userId,
-    );
-    updatedAccounts.push(updatedAccount);
-
-    localStorage.setItem("bank_accounts", JSON.stringify(updatedAccounts));
-
-    getAccounts.clear();
-
-    eventBus.emit("accounts:updated", updatedAccounts);
-  } catch (error) {
-    console.error("Помилка збереження рахунку", error);
-  }
+export function setAccounts(accounts) {
+  localStorage.setItem("bank_accounts", JSON.stringify(accounts));
+  getAccounts.clear();
+  eventBus.emit("accounts:updated", accounts);
 }
 
 export const getAccounts = memoize(

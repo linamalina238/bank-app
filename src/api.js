@@ -18,6 +18,27 @@ export async function getInitData() {
   return apiRequest("/init-data");
 }
 
+export async function depositRequest(amount) {
+  return apiRequest("/deposit", {
+    method: "POST",
+    body: JSON.stringify({ amount }),
+  });
+}
+
+export async function withdrawRequest(amount) {
+  return apiRequest("/withdraw", {
+    method: "POST",
+    body: JSON.stringify({ amount }),
+  });
+}
+
+export async function transferRequest(toUserId, amount) {
+  return apiRequest("/transfer", {
+    method: "POST",
+    body: JSON.stringify({ toUserId, amount }),
+  });
+}
+
 async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("token");
 
