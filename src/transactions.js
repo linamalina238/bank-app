@@ -80,3 +80,4 @@ export function getByCategory(category) {
   }
   return getHistory().filter(t => t.category === category);
 }
+ //https://i.pinimg.com/736x/7b/2b/10/7b2b10e9ea94acb32b0de2abc3ced005.jpg
