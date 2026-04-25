@@ -1,4 +1,4 @@
-import { getAccounts, getCurrentUser } from "./storage.js";
+import { getAccounts, getCurrentUser, setAccounts } from "./storage.js";
 
 // Баланс
 export function getBalance() {
@@ -35,7 +35,7 @@ export function deposit(amount) {
       : acc
   );
 
-  localStorage.setItem("bank_accounts", JSON.stringify(updated));
+  setAccounts(updated);
   return true;
 }
 
@@ -68,7 +68,7 @@ export function withdraw(amount) {
       : acc
   );
 
-  localStorage.setItem("bank_accounts", JSON.stringify(updated));
+ setAccounts(updated);
   return true;
 }
 
@@ -91,7 +91,7 @@ export function createAccount(userId) {
     balance: 0
   };
 
-  localStorage.setItem("bank_accounts", JSON.stringify([...accounts, newAccount]));
+  setAccounts([...accounts, newAccount]);
   return newAccount;
 }
 
@@ -123,6 +123,6 @@ export function resetBalance() {
       : acc
   );
 
-  localStorage.setItem("bank_accounts", JSON.stringify(updated));
+ setAccounts(updated);
   return true;
 }

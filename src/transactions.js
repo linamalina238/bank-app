@@ -1,4 +1,4 @@
-import { getAccounts, getCurrentUser, saveTransaction, getTransactions } from "./storage.js";
+import { getAccounts, getCurrentUser,setTransactions, getTransactions,setAccounts,} from "./storage.js";
 
 // Переказ
 export function transfer(toUserId, amount, category = "переказ") {
@@ -50,16 +50,15 @@ export function transfer(toUserId, amount, category = "переказ") {
     return acc;
   });
 
-  localStorage.setItem("bank_accounts", JSON.stringify(updated));
-
-  saveTransaction({
-    id: Date.now(),
-    fromId: currentUser.id,
-    toId: toUserId,
-    amount,
-    category,
-    date: new Date().toISOString()
-  });
+ setAccounts(updated);
+setTransactions([...getTransactions(), {
+  id: Date.now(),
+  fromId: currentUser.id,
+  toId: toUserId,
+  amount,
+  category,
+  date: new Date().toISOString()
+}]);
 
   return true;
 }
