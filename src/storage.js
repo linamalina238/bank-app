@@ -11,7 +11,7 @@ async function successAuth(user, token) {
 
   try {
     const data = await getInitData();
-    if (!data || !data.transactions) return;
+    if (!data || !data.transactions || data.balance === null) return;
 
     setAccounts([{ userId: user.id, balance: data.balance }]);
     setTransactions(data.transactions);
@@ -47,6 +47,7 @@ export function saveCurrentUser(user) {
     localStorage.setItem("bank_current_user", JSON.stringify(user));
 
     getCurrentUser.clear();
+    eventBus.emit("user:updated", user);
   } catch (error) {
     console.error("Помилка збереження поточного користувача", error);
   }
@@ -108,7 +109,6 @@ export const getAccounts = memoize(
 // Очищення сховища
 export function clearStorage() {
   try {
-    localStorage.removeItem("bank_users");
     localStorage.removeItem("bank_current_user");
     localStorage.removeItem("bank_transactions");
     localStorage.removeItem("bank_accounts");
