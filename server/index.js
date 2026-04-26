@@ -6,6 +6,7 @@ const data = require("./data.json");
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, ".."))); // роздача index.html та src/
 const PORT = 3000;
 
 // CORS middleware
@@ -35,7 +36,6 @@ app.post("/register", (req, res) => {
     });
   }
 
-  // Додавання нового користувача
   const newUser = {
     id: String(users.length + 1),
     name,

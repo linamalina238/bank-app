@@ -19,5 +19,12 @@
     "email": "katya@mail.com",
     "password": "11111",
     "phone": "+380991111111"
+  },
+  {
+    "id": "4",
+    "name": "aa",
+    "email": "aa@gmail.com",
+    "password": "1234",
+    "phone": "+38012345674"
   }
 ]
