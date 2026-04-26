@@ -4,7 +4,7 @@ export function memoize(fn, options = {}) {
   const ttl = options.ttl || null;
   let cacheSize = 0;
 
-  return function (...args) {
+  const memoized = function (...args) {
     const key = JSON.stringify(args);
 
     if (cache[key] !== undefined) {
@@ -27,4 +27,10 @@ export function memoize(fn, options = {}) {
     cacheSize++;
     return result;
   };
+
+  memoized.clear = () => {
+    Object.keys(cache).forEach((key) => delete cache[key]);
+    cacheSize = 0;
+  };
+  return memoized;
 }
