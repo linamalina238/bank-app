@@ -1,18 +1,23 @@
+require("dotenv").config();
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
-const users = require("./users.json");
 const data = require("./data.json");
+const { log } = require("../src/logger");
+const { authMiddleware } = require("./middleware/auth");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 app.use(express.json());
+<<<<<<< HEAD
 app.use(express.static(path.join(__dirname, ".."))); // роздача index.html та src/
 const PORT = 3000;
+=======
+const PORT = process.env.PORT || 3000;
+>>>>>>> a81b989869f4da9211c156892aadedf39b4a145e
 
 // CORS middleware
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Methods", "GET, POST");
 
   if (req.method === "OPTIONS") {
@@ -22,9 +27,22 @@ app.use((req, res, next) => {
   next();
 });
 
+// Роути
+app.use(authRoutes);
+
+// Захищений роут
+app.get(
+  "/init-data",
+  authMiddleware,
+  log({ level: "INFO" })(async (req, res) => {
+    res.json(data);
+  }),
+);
+
 app.listen(PORT, () => {
   console.log(`Сервер працює на http://localhost:${PORT}`);
 });
+<<<<<<< HEAD
 
 //Обробка запиту на реєстрацію нового користувача
 app.post("/register", (req, res) => {
@@ -80,3 +98,5 @@ app.post("/login", (req, res) => {
 app.get("/init-data", (req, res) => {
   res.json(data);
 });
+=======
+>>>>>>> a81b989869f4da9211c156892aadedf39b4a145e
