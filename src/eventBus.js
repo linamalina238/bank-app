@@ -25,7 +25,18 @@ class EventBus {
     const listeners = this.events[event];
 
     if (!listeners) return;
-    listeners.forEach((listener) => listener.call(null, data));
+    listeners.forEach((listener) => {
+      try {
+        listener.call(null, data);
+      } catch (error) {
+        const errorListener = this.events["error"];
+        if (errorListener && errorListener.length > 0) {
+          errorListener.forEach((l) => l({ event, data, error }));
+        } else {
+          console.error(`Необроблена помилка в '${event}' listener:`, error);
+        }
+      }
+    });
   }
 }
 
