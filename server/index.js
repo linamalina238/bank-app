@@ -4,6 +4,8 @@ const data = require("./data.json");
 const { log } = require("../src/logger");
 const { authMiddleware } = require("./middleware/auth");
 const authRoutes = require("./routes/auth");
+const accountsRoutes = require("./routes/accounts");
+const transactionsRoutes = require("./routes/transactions");
 
 const app = express();
 app.use(express.json());
@@ -24,13 +26,16 @@ app.use((req, res, next) => {
 
 // Роути
 app.use(authRoutes);
+app.use(accountsRoutes);
+app.use(transactionsRoutes);
 
 // Захищений роут
 app.get(
   "/init-data",
   authMiddleware,
   log({ level: "INFO" })(async (req, res) => {
-    res.json(data);
+    const fresh = require("./data.json");
+    res.json(fresh);
   }),
 );
 
