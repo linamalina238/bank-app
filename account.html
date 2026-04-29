@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bank App — Акаунт</title>
+  <link rel="stylesheet" href="src/style.css"/>
+</head>
+<body>
+
+<div id="dashboard-screen">
+
+  <header>
+    <span>BankHUB</span>
+    <div>
+      <span id="user-name"></span>
+      <button id="logout-btn">Вийти</button>
+    </div>
+  </header>
+
+  <main>
+
+    <div class="balance-card">
+      <div>Баланс</div>
+      <div id="balance">0.00 ₴</div>
+    </div>
+
+    <div class="actions">
+      <button id="btn-open-deposit">＋ Поповнити</button>
+      <button id="btn-open-withdraw">－ Зняти</button>
+      <button id="btn-open-transfer">→ Переказати</button>
+    </div>
+
+    <form id="deposit-form" class="op-form hidden">
+      <input id="deposit-amount" type="number" placeholder="Сума (₴)" min="0.01" step="0.01"/>
+      <button type="submit">Поповнити</button>
+      <p id="deposit-error" class="error"></p>
+    </form>
+
+    <form id="withdraw-form" class="op-form hidden">
+      <input id="withdraw-amount" type="number" placeholder="Сума (₴)" min="0.01" step="0.01"/>
+      <button type="submit">Зняти</button>
+      <p id="withdraw-error" class="error"></p>
+    </form>
+
+    <form id="transfer-form" class="op-form hidden">
+      <input id="transfer-to" type="text" placeholder="ID отримувача"/>
+      <input id="transfer-amount" type="number" placeholder="Сума (₴)" min="0.01" step="0.01"/>
+      <button type="submit">Переказати</button>
+      <p id="transfer-error" class="error"></p>
+    </form>
+
+    <h3>Транзакції</h3>
+    <div id="transactions-list"></div>
+
+  </main>
+
+</div>
+
+<script>
+  // Перевірка сесії
+  const user = JSON.parse(localStorage.getItem('bank_current_user') || 'null');
+  if (!user) window.location.href = 'index.html';
+  else {
+    document.getElementById('user-name').textContent = user.name || user.email;
+  }
+
+  // Вихід
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('bank_current_user');
+    window.location.href = 'index.html';
+  });
+
+  // Перемикання форм
+  ['deposit','withdraw','transfer'].forEach(type => {
+    document.getElementById(`btn-open-${type}`).addEventListener('click', () => {
+      const form = document.getElementById(`${type}-form`);
+      form.classList.toggle('hidden');
+    });
+  });
+</script>
+
+<script type="module">
+  import { getAccounts, getTransactions } from './src/storage.js';
+
+  const user = JSON.parse(localStorage.getItem('bank_current_user') || 'null');
+
+  // Баланс
+  const accounts = getAccounts();
+  const acc = accounts.find(a => a.userId === user?.id);
+  if (acc) document.getElementById('balance').textContent = Number(acc.balance).toFixed(2) + ' ₴';
+
+  // Транзакції
+  const transactions = getTransactions();
+  const list = document.getElementById('transactions-list');
+  if (transactions.length === 0) {
+    list.innerHTML = '<p>Транзакцій поки немає</p>';
+  } else {
+    list.innerHTML = transactions.slice().reverse().map(t => `
+      <div class="tx-item ${t.type}">
+        <span>${t.category || 'Транзакція'}</span>
+        <span>${t.date || ''}</span>
+        <span>${t.type === 'income' ? '+' : '-'}${Number(t.amount).toFixed(2)} ₴</span>
+      </div>
+    `).join('');
+  }
+</script>
+
+</body>
+</html>
