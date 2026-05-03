@@ -19,3 +19,25 @@ export function showToast(message, type = 'info') {
     toast.classList.remove('toast--visible');
   }, 3000);
 }
+
+function setFormLoading(form, loading) {
+  const btn     = form.querySelector('.btn-submit');
+  const label   = form.querySelector('.btn-label');
+  const spinner = form.querySelector('.spinner');
+ 
+  if (!btn) return;
+ 
+  btn.disabled = loading;
+  if (label)   label.style.opacity  = loading ? '0' : '1';
+  if (spinner) spinner.style.opacity = loading ? '1' : '0';
+}
+ 
+function showFormError(errorId, message) {
+  const el = document.getElementById(errorId);
+  if (el) el.textContent = message;
+}
+ 
+function clearFormError(errorId) {
+  const el = document.getElementById(errorId);
+  if (el) el.textContent = '';
+}
