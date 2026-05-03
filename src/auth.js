@@ -1,43 +1,41 @@
 import { loginAndSave, registerAndSave, getCurrentUser, clearStorage } from './storage.js';
-import { validateLoginData, validateRegistrationData } from './validation.js';
 import { eventBus } from './eventBus.js';
 
 export async function handleLogin(email, password) {
-  const validation = validateLoginData(email, password);
-  if (!validation.success) {
-    return validation;
+  if (!email || !password) {
+    return { success: false, message: "Please enter email and password" };
   }
 
   const result = await loginAndSave(email, password);
   
   if (result.success) {
-    console.log("Користувач увійшов:", result.user.name);
+    console.log("User logged in:", result.user.name);
     return { success: true, user: result.user };
   } else {
-    return { success: false, message: result.message || "Помилка входу" };
+    console.log("Login error:", result.message);
+    return { success: false, message: result.message };
   }
 }
 
 export async function handleRegister(name, email, password, phone) {
-  const validation = validateRegistrationData(name, email, password, phone);
-  if (!validation.success) {
-    return validation;
+  if (!name || !email || !password) {
+    return { success: false, message: "Please fill all fields" };
   }
 
   const result = await registerAndSave(name, email, password, phone);
   
   if (result.success) {
-    console.log("Новий користувач створений:", result.user.name);
+    console.log("New user:", result.user.name);
     return { success: true, user: result.user };
   } else {
-    return { success: false, message: result.message || "Помилка реєстрації" };
+    console.log("Registration error:", result.message);
+    return { success: false, message: result.message };
   }
 }
 
 export function isAuthenticated() {
   const user = getCurrentUser();
-  const token = localStorage.getItem("token");
-  return !!(user && token);
+  return !!user;
 }
 
 export function getCurrentUserFromStorage() {
@@ -46,13 +44,13 @@ export function getCurrentUserFromStorage() {
 
 export function logout() {
   clearStorage();
-  console.log("Користувач вийшов з системи");
+  console.log("User logged out");
 }
 
 export function onUserLogin(callback) {
-  eventBus.subscribe("user:login", callback);
+  eventBus.on("user:login", callback);
 }
 
 export function onUserLogout(callback) {
-  eventBus.subscribe("user:logout", callback);
+  eventBus.on("user:logout", callback);
 }
