@@ -41,3 +41,55 @@ function clearFormError(errorId) {
   const el = document.getElementById(errorId);
   if (el) el.textContent = '';
 }
+
+import { handleLogin, handleRegister } from './auth.js';
+ 
+function initLoginForm() {
+  const form = document.getElementById('login-form');
+  if (!form) return;
+ 
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearFormError('login-error');
+ 
+    const email    = document.getElementById('login-email')?.value.trim();
+    const password = document.getElementById('login-password')?.value;
+ 
+    setFormLoading(form, true);
+    const result = await handleLogin(email, password);
+    setFormLoading(form, false);
+ 
+    if (result.success) {
+      showToast('Вхід успішний!', 'success');
+    } else {
+      showFormError('login-error', result.message || 'Помилка входу');
+      showToast(result.message || 'Помилка входу', 'error');
+    }
+  });
+}
+ 
+function initRegisterForm() {
+  const form = document.getElementById('register-form');
+  if (!form) return;
+ 
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearFormError('register-error');
+ 
+    const name     = document.getElementById('register-name')?.value.trim();
+    const email    = document.getElementById('register-email')?.value.trim();
+    const phone    = document.getElementById('register-phone')?.value.trim();
+    const password = document.getElementById('register-password')?.value;
+ 
+    setFormLoading(form, true);
+    const result = await handleRegister(name, email, password, phone);
+    setFormLoading(form, false);
+ 
+    if (result.success) {
+      showToast('Акаунт створено!', 'success');
+    } else {
+      showFormError('register-error', result.message || 'Помилка реєстрації');
+      showToast(result.message || 'Помилка реєстрації', 'error');
+    }
+  });
+}
