@@ -183,3 +183,11 @@ function initTransferForm() {
     }
   });
 }
+
+export function initForms() {
+  initLoginForm();
+  initRegisterForm();
+  initDepositForm();
+  initWithdrawForm();
+  initTransferForm();
+}
