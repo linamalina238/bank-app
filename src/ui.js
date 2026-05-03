@@ -93,3 +93,93 @@ function initRegisterForm() {
     }
   });
 }
+
+import { deposit, withdraw } from './account.js';
+import { transfer } from './transactions.js';
+ 
+function initDepositForm() {
+  const form = document.getElementById('deposit-form');
+  if (!form) return;
+ 
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearFormError('deposit-error');
+ 
+    const amount = parseFloat(document.getElementById('deposit-amount')?.value);
+    if (!amount || amount <= 0) {
+      showFormError('deposit-error', 'Введіть коректну суму');
+      return;
+    }
+ 
+    const result = await deposit(amount);
+ 
+    if (result.success) {
+      form.reset();
+      form.classList.add('hidden');
+      showToast(`Поповнено на ${amount.toFixed(2)} ₴`, 'success');
+    } else {
+      showFormError('deposit-error', result.message || 'Помилка поповнення');
+      showToast(result.message || 'Помилка поповнення', 'error');
+    }
+  });
+}
+ 
+function initWithdrawForm() {
+  const form = document.getElementById('withdraw-form');
+  if (!form) return;
+ 
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearFormError('withdraw-error');
+ 
+    const amount = parseFloat(document.getElementById('withdraw-amount')?.value);
+    if (!amount || amount <= 0) {
+      showFormError('withdraw-error', 'Введіть коректну суму');
+      return;
+    }
+ 
+    const result = await withdraw(amount);
+ 
+    if (result.success) {
+      form.reset();
+      form.classList.add('hidden');
+      showToast(`Знято ${amount.toFixed(2)} ₴`, 'success');
+    } else {
+      showFormError('withdraw-error', result.message || 'Помилка зняття');
+      showToast(result.message || 'Помилка зняття', 'error');
+    }
+  });
+}
+ 
+function initTransferForm() {
+  const form = document.getElementById('transfer-form');
+  if (!form) return;
+ 
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearFormError('transfer-error');
+ 
+    const toUserId = document.getElementById('transfer-to')?.value.trim();
+    const amount   = parseFloat(document.getElementById('transfer-amount')?.value);
+ 
+    if (!toUserId) {
+      showFormError('transfer-error', 'Введіть ID отримувача');
+      return;
+    }
+    if (!amount || amount <= 0) {
+      showFormError('transfer-error', 'Введіть коректну суму');
+      return;
+    }
+ 
+    const result = await transfer(toUserId, amount);
+ 
+    if (result.success) {
+      form.reset();
+      form.classList.add('hidden');
+      showToast(`Переказано ${amount.toFixed(2)} ₴`, 'success');
+    } else {
+      showFormError('transfer-error', result.message || 'Помилка переказу');
+      showToast(result.message || 'Помилка переказу', 'error');
+    }
+  });
+}
