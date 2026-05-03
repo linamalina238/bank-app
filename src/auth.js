@@ -1,9 +1,11 @@
 import { loginAndSave, registerAndSave, getCurrentUser, clearStorage } from './storage.js';
+import { validateLoginData, validateRegistrationData } from './validation.js';
 import { eventBus } from './eventBus.js';
 
 export async function handleLogin(email, password) {
-  if (!email || !password) {
-    return { success: false, message: "Please enter email and password" };
+  const validation = validateLoginData(email, password);
+  if (!validation.success) {
+    return validation;
   }
 
   const result = await loginAndSave(email, password);
@@ -18,8 +20,9 @@ export async function handleLogin(email, password) {
 }
 
 export async function handleRegister(name, email, password, phone) {
-  if (!name || !email || !password) {
-    return { success: false, message: "Please fill all fields" };
+  const validation = validateRegistrationData(name, email, password, phone);
+  if (!validation.success) {
+    return validation;
   }
 
   const result = await registerAndSave(name, email, password, phone);
@@ -35,7 +38,8 @@ export async function handleRegister(name, email, password, phone) {
 
 export function isAuthenticated() {
   const user = getCurrentUser();
-  return !!user;
+  const token = localStorage.getItem("token");
+  return !!(user && token);
 }
 
 export function getCurrentUserFromStorage() {
@@ -48,9 +52,9 @@ export function logout() {
 }
 
 export function onUserLogin(callback) {
-  eventBus.on("user:login", callback);
+  eventBus.subscribe("user:login", callback);
 }
 
 export function onUserLogout(callback) {
-  eventBus.on("user:logout", callback);
+  eventBus.subscribe("user:logout", callback);
 }
