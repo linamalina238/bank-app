@@ -1,23 +1,21 @@
-let toastTimer = null;
+import { loginAndSave, registerAndSave, clearStorage } from "./storage.js";
+import { getAccounts, getTransactions, getCurrentUser } from "./storage.js";
  
-export function showToast(message, type = 'info') {
-  const toast  = document.getElementById('povidomlennya');
-  const icon   = document.getElementById('toastIkona');
-  const text   = document.getElementById('toastTekst');
+export function showDashboard() {
+  document.getElementById("auth-screen").style.display = "none";
+  document.getElementById("dashboard-screen").style.display = "block";
+   
+  const user = getCurrentUser();
+    if (!user) return;
+
+    const account = getAccounts();
+    const account = accounts.find((acc) => acc.userId === user.id); 
+    renderTransactions(getTransactions());
+}    
  
-  if (!toast || !icon || !text) return;
- 
-  const icons = { success: '✓', error: '✕', info: 'ℹ' };
- 
-  icon.textContent = icons[type] ?? icons.info;
-  text.textContent = message;
- 
-  toast.className = `toast toast--${type} toast--visible`;
- 
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove('toast--visible');
-  }, 3000);
+export function showAuthScreen() {
+  document.getElementById("dashboard-screen").style.display = "none";
+  document.getElementById("auth-screen").style.display = "block";
 }
 
 function setFormLoading(form, loading) {
@@ -187,7 +185,5 @@ function initTransferForm() {
 export function initForms() {
   initLoginForm();
   initRegisterForm();
-  initDepositForm();
-  initWithdrawForm();
-  initTransferForm();
+  initLogoutButton();
 }
