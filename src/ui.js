@@ -18,22 +18,42 @@ export function showAuthScreen() {
   document.getElementById("auth-screen").style.display = "block";
 }
 
-function setFormLoading(form, loading) {
-  const btn     = form.querySelector('.btn-submit');
-  const label   = form.querySelector('.btn-label');
-  const spinner = form.querySelector('.spinner');
- 
-  if (!btn) return;
- 
-  btn.disabled = loading;
-  if (label)   label.style.opacity  = loading ? '0' : '1';
-  if (spinner) spinner.style.opacity = loading ? '1' : '0';
+export function renderUserInfo(user) {
+  const el = document.getElementById("user-name");
+  if (el) el.textContent = user.name;
 }
  
-function showFormError(errorId, message) {
-  const el = document.getElementById(errorId);
-  if (el) el.textContent = message;
+export function renderBalance(balance) {
+  const el = document.getElementById("account-balance");
+  if (el) el.textContent = `${balance.toFixed(2)} ₴`;
 }
+ 
+export function renderTransactions(transactions) {
+  const list = document.getElementById("transactions-list");
+  if (!list) return;
+  if (transactions.length) {
+    list.innerHTML = "<p>Немає транзакцій</p>";
+    return;
+  }
+
+    list.innerHTML = transactions
+    .slice()
+    .reverse()
+    .map((t => {
+        const currentUser = getCurrentUser();
+        const isIncome = t.toId === currentUser.id;
+        return `
+        <div class="transaction ${isIncome ? 'income' : 'expense'}">
+            <span class="transaction-category">${t.category}</span>
+            <span class="transaction-amount">${isIncome ? '+' : '-'}${t.amount.toFixed(2)} ₴</span>
+            <span class="transaction-date">${new Date(t.date).toLocaleString()}</span>
+        </div>
+        `;
+    }))
+    .join("");
+}
+    
+
  
 function clearFormError(errorId) {
   const el = document.getElementById(errorId);
