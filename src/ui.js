@@ -53,35 +53,27 @@ export function renderTransactions(transactions) {
     .join("");
 }
     
+export function initForms() {
+  initLoginForm();
+  initRegisterForm();
+  initLogoutButton();
+}        
 
- 
-function clearFormError(errorId) {
-  const el = document.getElementById(errorId);
-  if (el) el.textContent = '';
-}
-
-import { handleLogin, handleRegister } from './auth.js';
- 
 function initLoginForm() {
   const form = document.getElementById('login-form');
   if (!form) return;
  
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    clearFormError('login-error');
+    const email    = document.getElementById('login-email').value();
+    const password = document.getElementById('login-password').value;
  
-    const email    = document.getElementById('login-email')?.value.trim();
-    const password = document.getElementById('login-password')?.value;
+    const result = await loginAndSave(email, password);
  
-    setFormLoading(form, true);
-    const result = await handleLogin(email, password);
-    setFormLoading(form, false);
- 
-    if (result.success) {
-      showToast('Вхід успішний!', 'success');
+    if (!result.success) {
+      Error('login-error', result.message);
     } else {
-      showFormError('login-error', result.message || 'Помилка входу');
-      showToast(result.message || 'Помилка входу', 'error');
+     window.location.href = "account.html";
     }
   });
 }
@@ -92,36 +84,30 @@ function initRegisterForm() {
  
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    clearFormError('register-error');
+    const name     = document.getElementById('register-name').value.();
+    const email    = document.getElementById('register-email').value.();
+    const phone    = document.getElementById('register-phone').value.();
+    const password = document.getElementById('register-password').value;
  
-    const name     = document.getElementById('register-name')?.value.trim();
-    const email    = document.getElementById('register-email')?.value.trim();
-    const phone    = document.getElementById('register-phone')?.value.trim();
-    const password = document.getElementById('register-password')?.value;
+    const result = await registerAndSave(name, email, password, phone);
  
-    setFormLoading(form, true);
-    const result = await handleRegister(name, email, password, phone);
-    setFormLoading(form, false);
- 
-    if (result.success) {
-      showToast('Акаунт створено!', 'success');
+    if (!result.success) {
+      showError('register-error', result.message);
     } else {
-      showFormError('register-error', result.message || 'Помилка реєстрації');
-      showToast(result.message || 'Помилка реєстрації', 'error');
+      window.location.href = "account.html";
     }
   });
 }
-
-import { deposit, withdraw } from './account.js';
-import { transfer } from './transactions.js';
  
-function initDepositForm() {
-  const form = document.getElementById('deposit-form');
-  if (!form) return;
+function initLogoutButton() {
+  const btn = document.getElementById('logout-btn');
+  if (!btn) return;
  
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearFormError('deposit-error');
+  btn.addEventListener('click', () => {
+    clearStorage();
+    window.location.href = "index.html";
+  });
+}
  
     const amount = parseFloat(document.getElementById('deposit-amount')?.value);
     if (!amount || amount <= 0) {
@@ -202,8 +188,3 @@ function initTransferForm() {
   });
 }
 
-export function initForms() {
-  initLoginForm();
-  initRegisterForm();
-  initLogoutButton();
-}
