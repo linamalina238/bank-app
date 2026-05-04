@@ -1,16 +1,11 @@
-import { getCurrentUser } from './storage.js';
-import { initForms } from './ui.js';
- 
-if (getCurrentUser()) {
-  window.location.href = 'account.html';
-}
+import { getCurrentUser, clearStorage } from "./storage.js";
+import { eventBus } from "./eventBus.js";
+import {
+  renderUserInfo,
+  renderBalance,
+  renderTransactions,
+  showDashboard,
+  showAuthScreen,
+  initForms,
+} from "./ui.js";
 
-initForms();
-
-['login-form', 'register-form'].forEach(id => {
-  document.getElementById(id)?.addEventListener('submit', () => {
-    setTimeout(() => {
-      if (getCurrentUser()) window.location.href = 'account.html';
-    }, 600);
-  });
-});
