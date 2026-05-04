@@ -2,8 +2,21 @@ const express = require("express");
 const router = express.Router();
 const { authMiddleware } = require("../middleware/auth");
 const { log } = require("../../src/logger");
-
+const fs = require("fs");
+const path = require("path");
 const { accounts, transactions } = require("./accounts");
+
+function readData() {
+  const raw = fs.readFileSync(path.join(__dirname, "../data.json"), "utf-8");
+  return JSON.parse(raw);
+}
+
+function writeData(data) {
+  fs.writeFileSync(
+    path.join(__dirname, "../data.json"),
+    JSON.stringify(data, null, 2),
+  );
+}
 
 router.post(
   "/transfer",
@@ -21,9 +34,10 @@ router.post(
     if (toUserId === fromUserId) {
       return res.json({ success: false, message: "Не можна переказати самому собі" });
     }
+  const data = readData();
 
-    const fromAccount = accounts.find((a) => a.userId === fromUserId);
-    const toAccount = accounts.find((a) => a.userId === toUserId);
+    const fromAccount = data.accounts.find((a) => a.userId === fromUserId);
+    const toAccount = data.accounts.find((a) => a.userId === toUserId);
 
     if (!fromAccount) {
       return res.json({ success: false, message: "Ваш рахунок не знайдено" });
@@ -46,9 +60,11 @@ router.post(
       category: "переказ",
       date: new Date().toISOString(),
     };
-    transactions.push(transaction);
+    data.transactions.push(transaction);
 
-    res.json({ success: true, accounts: [...accounts], transactions: [...transactions] });
+    writeData(data);
+
+    res.json({ success: true, accounts: [...data.accounts], transactions: [...data.transactions] });
   }),
 );
 

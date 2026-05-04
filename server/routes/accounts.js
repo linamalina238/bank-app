@@ -2,10 +2,24 @@ const express = require("express");
 const router = express.Router();
 const { authMiddleware } = require("../middleware/auth");
 const { log } = require("../../src/logger");
+const fs = require("fs");
+const path = require("path");
 
 
-const accounts = [];
-const transactions = [];
+
+
+function readData() {
+  const raw = fs.readFileSync(path.join(__dirname, "../data.json"), "utf-8");
+  return JSON.parse(raw);
+}
+
+function writeData(data) {
+  fs.writeFileSync(
+    path.join(__dirname, "../data.json"),
+    JSON.stringify(data, null, 2),
+  );
+}
+
 
 router.post(
   "/deposit",
@@ -17,11 +31,12 @@ router.post(
     if (!amount || typeof amount !== "number" || amount <= 0) {
       return res.json({ success: false, message: "Невірна сума" });
     }
+ const data = readData();
 
-    let account = accounts.find((a) => a.userId === userId);
+    let account = data.accounts.find((a) => a.userId === userId);
     if (!account) {
       account = { userId, balance: 0 };
-      accounts.push(account);
+      data.accounts.push(account);
     }
 
     account.balance += amount;
@@ -34,9 +49,11 @@ router.post(
       category: "поповнення",
       date: new Date().toISOString(),
     };
-    transactions.push(transaction);
+    data.transactions.push(transaction);
 
-    res.json({ success: true, accounts: [...accounts], transactions: [...transactions] });
+    writeData(data);
+
+    res.json({ success: true, accounts: [...data.accounts], transactions: [...data.transactions] });
   }),
 );
 
@@ -51,7 +68,8 @@ router.post(
       return res.json({ success: false, message: "Невірна сума" });
     }
 
-    const account = accounts.find((a) => a.userId === userId);
+    const data = readData();
+    const account = data.accounts.find((a) => a.userId === userId);
     if (!account) {
       return res.json({ success: false, message: "Рахунок не знайдено" });
     }
@@ -69,9 +87,11 @@ router.post(
       category: "списання",
       date: new Date().toISOString(),
     };
-    transactions.push(transaction);
+    data.transactions.push(transaction);
 
-    res.json({ success: true, accounts: [...accounts], transactions: [...transactions] });
+    writeData(data);
+
+    res.json({ success: true, accounts: [...data.accounts], transactions: [...data.transactions] });
   }),
 );
 
