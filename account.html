@@ -1,763 +1,943 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="UTF-8"/>
-  <link rel="icon" href="https://www.shutterstock.com/image-vector/black-credit-card-icon-on-600nw-2632177557.jpg" type="image/x-icon">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bank App — Акаунт</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/style.css"/>
-</head>
-<body>
-
-<div id="dashboard-screen">
-
-  <!-- Хедер -->
-  <div class="dash-header">
-    <div class="dash-logo">Bank<span>HUB</span></div>
-    <div class="dash-header-right">
-      <div class="dash-avatar" id="user-avatar" onclick="toggleMenu()">U</div>
-    </div>
-  </div>
-
-  <!-- Профіль меню -->
-  <div class="profile-menu hidden" id="profile-menu">
-    <div class="profile-menu-top">
-      <label class="avatar-upload" for="avatar-input">
-        <div class="profile-menu-avatar" id="menu-avatar">U</div>
-        <div class="avatar-edit-hint">Змінити фото</div>
-      </label>
-      <input type="file" id="avatar-input" accept="image/*" style="display:none"/>
-      <div class="profile-menu-info">
-        <div class="profile-menu-name" id="menu-name"></div>
-        <div class="profile-menu-email" id="menu-email"></div>
-      </div>
-    </div>
-
-    <!-- Кнопки -->
-    <button class="profile-card-btn" id="open-card-btn">Моя картка</button>
-    <button class="profile-new-card-btn" id="open-new-card-btn">Створити картку</button>
-    <button class="profile-cashback-btn" id="open-cashback-btn">Кешбек</button>
-
-    <button class="profile-menu-logout" id="menu-logout-btn">Вийти</button>
-  </div>
-
-  <!-- Модальне вікно картки — показує картки з головного слайдера -->
-  <div class="card-modal hidden" id="card-modal">
-    <div class="card-modal-bg" onclick="closeCard()"></div>
-    <div class="card-modal-content">
-      <div id="card-modal-slider-wrap" style="width:320px;overflow:hidden;">
-        <div id="card-modal-slider" style="display:flex;transition:transform .35s ease;"></div>
-        <div id="card-modal-dots" style="display:flex;justify-content:center;gap:6px;margin-top:12px;"></div>
-      </div>
-      <button class="card-close-btn" onclick="closeCard()">Закрити</button>
-    </div>
-  </div>
-
-  <!-- Модальне кешбеку -->
-  <div class="cashback-modal hidden" id="cashback-modal">
-    <div class="cashback-modal-bg" onclick="closeCashback()"></div>
-    <div class="cashback-modal-content">
-      <h3>Ваш кешбек</h3>
-      <div class="cashback-amount" id="cashback-amount">0.00 ₴</div>
-      <p class="cashback-sub">Кешбек нараховується 1% від усіх витрат.<br/>Накопичено за весь час.</p>
-      <button class="cashback-close-btn" onclick="closeCashback()">Закрити</button>
-    </div>
-  </div>
-
-  <!-- Модальне нової картки -->
-  <div class="new-card-modal hidden" id="new-card-modal">
-    <div class="new-card-modal-bg" onclick="closeNewCard()"></div>
-    <div class="new-card-modal-content" id="new-card-inner">
-      <h3>Створити нову картку</h3>
-      <div class="new-card-types" id="card-type-list">
-        <div class="card-type-option selected" data-type="standard">
-          <div class="card-type-name">⬛ Standard</div>
-          <div class="card-type-desc">Безкоштовна • Базові функції</div>
-        </div>
-        <div class="card-type-option" data-type="premium">
-          <div class="card-type-name">💳 Premium Black</div>
-          <div class="card-type-desc">99 ₴/міс • Кешбек 2% • Пріоритет</div>
-        </div>
-        <div class="card-type-option" data-type="virtual">
-          <div class="card-type-name">Virtual</div>
-          <div class="card-type-desc">Безкоштовна • Тільки онлайн</div>
-        </div>
-        <div class="card-type-option" data-type="pikmi">
-          <div class="card-type-name">Pikmi</div>
-          <div class="card-type-desc">Для справжніх пікмі • Рожева • Slay ✦</div>
+  <head>
+    <meta charset="UTF-8"/>
+    <link 
+      rel="icon" 
+      href="https://www.shutterstock.com/image-vector/black-credit-card-icon-on-600nw-2632177557.jpg" 
+      type="image/x-icon"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bank App — Акаунт</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" 
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="src/style.css"/>
+  </head>
+  <body>
+    <div id="dashboard-screen">
+      <!-- Хедер -->
+      <div class="dash-header">
+        <div class="dash-logo">Bank<span>HUB</span></div>
+        <div class="dash-header-right">
+          <div class="dash-avatar" id="user-avatar" onclick="toggleMenu()">
+            U
+          </div>
         </div>
       </div>
-      <div class="new-card-actions">
-        <button class="new-card-cancel" onclick="closeNewCard()">Скасувати</button>
-        <button class="new-card-confirm" id="confirm-new-card-btn">Створити</button>
+
+      <!-- Профіль меню -->
+      <div class="profile-menu hidden" id="profile-menu">
+        <div class="profile-menu-top">
+          <label class="avatar-upload" for="avatar-input">
+            <div class="profile-menu-avatar" id="menu-avatar">U</div>
+            <div class="avatar-edit-hint">Змінити фото</div>
+          </label>
+          <input 
+            type="file" 
+            id="avatar-input" 
+            accept="image/*" 
+            style="display:none"
+          />
+          <div class="profile-menu-info">
+            <div class="profile-menu-name" id="menu-name"></div>
+            <div class="profile-menu-email" id="menu-email"></div>
+          </div>
+        </div>
+
+        <!-- Кнопки -->
+        <button class="profile-card-btn" id="open-card-btn">Моя картка</button>
+        <button class="profile-new-card-btn" id="open-new-card-btn">
+          Створити картку
+        </button>
+        <button class="profile-cashback-btn" id="open-cashback-btn">
+          Кешбек
+        </button>
+
+        <button class="profile-menu-logout" id="menu-logout-btn">Вийти</button>
+    </div>
+
+    <!-- Модальне вікно картки — показує картки з головного слайдера -->
+    <div class="card-modal hidden" id="card-modal">
+      <div class="card-modal-bg" onclick="closeCard()"></div>
+      <div class="card-modal-content">
+        <div 
+          id="card-modal-slider-wrap" 
+          style="width:320px;overflow:hidden;"
+        >
+          <div 
+            id="card-modal-slider" 
+            style="display:flex;transition:transform .35s ease;"
+          ></div>
+          <div 
+            id="card-modal-dots" 
+            style="
+              display:flex;
+              justify-content:center;
+              gap:6px;
+              margin-top:12px;
+            "
+          ></div>
+        </div>
+        <button class="card-close-btn" onclick="closeCard()">Закрити</button>
       </div>
+    </div>
+
+    <!-- Модальне кешбеку -->
+    <div class="cashback-modal hidden" id="cashback-modal">
+      <div class="cashback-modal-bg" onclick="closeCashback()"></div>
+      <div class="cashback-modal-content">
+        <h3>Ваш кешбек</h3>
+        <div class="cashback-amount" id="cashback-amount">0.00 ₴</div>
+        <p class="cashback-sub">
+          Кешбек нараховується 1% від усіх витрат.<br/>Накопичено за весь 
+          час.
+        </p>
+        <button class="cashback-close-btn" onclick="closeCashback()">
+          Закрити
+        </button>
+      </div>
+    </div>
+
+    <!-- Модальне нової картки -->
+    <div class="new-card-modal hidden" id="new-card-modal">
+      <div class="new-card-modal-bg" onclick="closeNewCard()"></div>
+      <div class="new-card-modal-content" id="new-card-inner">
+        <h3>Створити нову картку</h3>
+        <div class="new-card-types" id="card-type-list">
+          <div class="card-type-option selected" data-type="standard">
+            <div class="card-type-name">⬛ Standard</div>
+            <div class="card-type-desc">Безкоштовна • Базові функції</div>
+          </div>
+          <div class="card-type-option" data-type="premium">
+            <div class="card-type-name">💳 Premium Black</div>
+            <div class="card-type-desc">99 ₴/міс • Кешбек 2% • Пріоритет</div>
+          </div>
+          <div class="card-type-option" data-type="virtual">
+            <div class="card-type-name">Virtual</div>
+            <div class="card-type-desc">Безкоштовна • Тільки онлайн</div>
+          </div>
+          <div class="card-type-option" data-type="pikmi">
+            <div class="card-type-name">Pikmi</div>
+            <div class="card-type-desc">
+              Для справжніх пікмі • Рожева • Slay ✦
+            </div>
+          </div>
+        </div>
+        <div class="new-card-actions">
+          <button class="new-card-cancel" onclick="closeNewCard()">
+            Скасувати
+          </button>
+          <button class="new-card-confirm" id="confirm-new-card-btn">
+            Створити
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Скролл контент -->
+    <div class="dash-scroll">
+      <!-- Слайдер карток -->
+      <div class="cards-slider-wrap">
+        <div class="cards-slider" id="cards-slider">
+          <!-- картки додаються JS-ом -->
+        </div>
+        <div class="cards-slider-dots" id="cards-dots"></div>
+      </div>
+
+      <div class="dash-actions">
+        <div class="dash-action-btn" id="btn-open-deposit">
+          <span class="dash-action-icon">＋</span>
+          <span class="dash-action-label">Поповнити</span>
+        </div>
+        <div class="dash-action-btn" id="btn-open-withdraw">
+          <span class="dash-action-icon">－</span>
+          <span class="dash-action-label">Зняти</span>
+        </div>
+        <div class="dash-action-btn" id="btn-open-transfer">
+          <span class="dash-action-icon">→</span>
+          <span class="dash-action-label">Переказати</span>
+        </div>
+      </div>
+
+      <!-- Форми -->
+      <form id="deposit-form" class="dash-op-form hidden">
+        <div class="dash-op-title">Поповнення</div>
+        <input 
+          id="deposit-amount" 
+          type="number" 
+          placeholder="Сума (₴)" 
+          min="0.01" 
+          step="0.01"
+        />
+        <button type="submit">Поповнити</button>
+        <p id="deposit-error" class="dash-error"></p>
+      </form>
+
+      <form id="withdraw-form" class="dash-op-form hidden">
+        <div class="dash-op-title">Зняти кошти</div>
+        <input 
+          id="withdraw-amount" 
+          type="number" 
+          placeholder="Сума (₴)" 
+          min="0.01" 
+          step="0.01"
+        />
+        <button type="submit">Зняти</button>
+        <p id="withdraw-error" class="dash-error"></p>
+      </form>
+
+      <form id="transfer-form" class="dash-op-form hidden">
+        <div class="dash-op-title">Переказ</div>
+        <input id="transfer-to" type="text" placeholder="ID отримувача"/>
+        <input 
+          id="transfer-amount" 
+          type="number" 
+          placeholder="Сума (₴)" 
+          min="0.01" 
+          step="0.01"
+        />
+        <button type="submit">Переказати</button>
+        <p id="transfer-error" class="dash-error"></p>
+      </form>
+
+      <div class="dash-tx-header">Транзакції</div>
+      <div id="transactions-list" class="dash-tx-list"></div>
     </div>
   </div>
 
-  <!-- Скролл контент -->
-  <div class="dash-scroll">
+  <script type="module">
+    // ЗМІНА 1: додано saveCurrentUser в імпорт
+    import { 
+      getCurrentUser, 
+      saveCurrentUser, 
+      clearStorage, 
+      getAccounts, 
+      getTransactions,
+      setAccounts,
+      setTransactions,
+    } from './src/storage.js';
+    import { 
+      depositRequest,
+      withdrawRequest,
+      transferRequest, 
+    } from './src/api.js';
+    import { eventBus } from './src/eventBus.js';
 
-    <!-- Слайдер карток -->
-    <div class="cards-slider-wrap">
-      <div class="cards-slider" id="cards-slider">
-        <!-- картки додаються JS-ом -->
-      </div>
-      <div class="cards-slider-dots" id="cards-dots"></div>
-    </div>
+    const user = getCurrentUser();
+    if (!user) window.location.href = 'index.html';
 
-    <div class="dash-actions">
-      <div class="dash-action-btn" id="btn-open-deposit">
-        <span class="dash-action-icon">＋</span>
-        <span class="dash-action-label">Поповнити</span>
-      </div>
-      <div class="dash-action-btn" id="btn-open-withdraw">
-        <span class="dash-action-icon">－</span>
-        <span class="dash-action-label">Зняти</span>
-      </div>
-      <div class="dash-action-btn" id="btn-open-transfer">
-        <span class="dash-action-icon">→</span>
-        <span class="dash-action-label">Переказати</span>
-      </div>
-    </div>
+    // ── Аватарка зі збереженням у localStorage ──
+    const AVATAR_KEY = `bank_avatar_${user?.id}`;
 
-    <!-- Форми (завжди в скролі, не змінюють розмір сторінки) -->
-    <form id="deposit-form" class="dash-op-form hidden">
-      <div class="dash-op-title">Поповнення</div>
-      <input id="deposit-amount" type="number" placeholder="Сума (₴)" min="0.01" step="0.01"/>
-      <button type="submit">Поповнити</button>
-      <p id="deposit-error" class="dash-error"></p>
-    </form>
-
-    <form id="withdraw-form" class="dash-op-form hidden">
-      <div class="dash-op-title">Зняти кошти</div>
-      <input id="withdraw-amount" type="number" placeholder="Сума (₴)" min="0.01" step="0.01"/>
-      <button type="submit">Зняти</button>
-      <p id="withdraw-error" class="dash-error"></p>
-    </form>
-
-    <form id="transfer-form" class="dash-op-form hidden">
-      <div class="dash-op-title">Переказ</div>
-      <input id="transfer-to" type="text" placeholder="ID отримувача"/>
-      <input id="transfer-amount" type="number" placeholder="Сума (₴)" min="0.01" step="0.01"/>
-      <button type="submit">Переказати</button>
-      <p id="transfer-error" class="dash-error"></p>
-    </form>
-
-    <div class="dash-tx-header">Транзакції</div>
-    <div id="transactions-list" class="dash-tx-list"></div>
-
-  </div>
-</div>
-
-<script type="module">
-  // ЗМІНА 1: додано saveCurrentUser в імпорт
-  import { getCurrentUser, saveCurrentUser, clearStorage, getAccounts, getTransactions } from './src/storage.js';
-  import { eventBus } from './src/eventBus.js';
-
-  const user = getCurrentUser();
-  if (!user) window.location.href = 'index.html';
-
-  // ── Аватарка зі збереженням у localStorage ──
-  const AVATAR_KEY = `bank_avatar_${user?.id}`;
-
-  function getSavedAvatar() {
-    return localStorage.getItem(AVATAR_KEY) || null;
-  }
-  function setSavedAvatar(dataUrl) {
-    localStorage.setItem(AVATAR_KEY, dataUrl);
-  }
-
-  function applyAvatar(dataUrl) {
-    const imgHtml = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
-    document.getElementById('user-avatar').innerHTML = imgHtml;
-    document.getElementById('menu-avatar').innerHTML = imgHtml;
-  }
-
-  // ── Оновлення UI ──
-  function updateUI() {
-    const name = user.name || user.email || 'U';
-    const letter = name[0].toUpperCase();
-
-    const savedAvatar = getSavedAvatar();
-    if (savedAvatar) {
-      applyAvatar(savedAvatar);
-    } else {
-      document.getElementById('user-avatar').textContent = letter;
-      document.getElementById('menu-avatar').textContent = letter;
+    function getSavedAvatar() {
+      return localStorage.getItem(AVATAR_KEY) || null;
+    }
+    function setSavedAvatar(dataUrl) {
+      localStorage.setItem(AVATAR_KEY, dataUrl);
     }
 
-    document.getElementById('menu-name').textContent = user.name || '';
-    document.getElementById('menu-email').textContent = user.email || '';
-  }
-  updateUI();
-
-  // ── Слайдер карток ──
-  const CARDS_KEY = `bank_cards_${user?.id}`;
-
-  const cardThemes = {
-    standard: { label: 'Standard',  color: '#d36922' },
-    premium:  { label: 'Premium',   color: '#ff8c2a' },
-    virtual:  { label: 'Virtual',   color: '#ffa040' },
-    pikmi:    { label: 'Pick-me',   color: '#ff80c0' },
-  };
-
-  function cardInnerHTML(c, balance, i) {
-    const theme = cardThemes[c.type] || cardThemes.standard;
-
-    if (c.type === 'standard') {
-      return `
-        <div style="
-          min-width:100%;flex-shrink:0;
-          height:190px;border-radius:18px;position:relative;overflow:hidden;
-          background:linear-gradient(160deg,#1c1c1c 0%,#2a2520 40%,#1a1714 100%);
-          border:1px solid rgba(211,105,34,.35);
-          box-shadow:0 0 32px rgba(0,0,0,.6);
-        ">
-          <!-- Хвиля -->
-          <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.55" viewBox="0 0 340 190" preserveAspectRatio="none">
-            <path d="M-10 130 Q80 60 180 110 Q280 160 360 80" stroke="#c8601a" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <path d="M-10 140 Q80 70 180 120 Q280 170 360 90" stroke="#a04010" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"/>
-          </svg>
-          <!-- Чип -->
-          <div style="position:absolute;top:28px;left:24px;">
-            <svg width="38" height="30" viewBox="0 0 38 30">
-              <rect width="38" height="30" rx="4" fill="#b8920a" opacity=".9"/>
-              <rect x="4" y="4" width="30" height="22" rx="3" fill="none" stroke="#8a6a06" stroke-width="1"/>
-              <line x1="13" y1="0" x2="13" y2="30" stroke="#8a6a06" stroke-width=".8"/>
-              <line x1="25" y1="0" x2="25" y2="30" stroke="#8a6a06" stroke-width=".8"/>
-              <line x1="0" y1="10" x2="38" y2="10" stroke="#8a6a06" stroke-width=".8"/>
-              <line x1="0" y1="20" x2="38" y2="20" stroke="#8a6a06" stroke-width=".8"/>
-            </svg>
-          </div>
-          <!-- Назва банку -->
-          <div style="position:absolute;top:24px;right:20px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#d36922;letter-spacing:.12em;">BankHUB</div>
-          <!-- Лого -->
-          <div style="position:absolute;bottom:22px;right:20px;width:36px;height:36px;border-radius:50%;border:2px solid rgba(211,105,34,.6);display:flex;align-items:center;justify-content:center;">
-            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#d36922;">B</span>
-          </div>
-          <!-- Баланс -->
-          <div style="position:absolute;top:80px;left:24px;">
-            <div style="font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px;">Баланс</div>
-            <div class="mini-card-balance" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#e07830;text-shadow:0 0 12px rgba(211,105,34,.4);">${balance}</div>
-          </div>
-          <!-- Власник -->
-          <div style="position:absolute;bottom:26px;left:24px;">
-            <div style="font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.1em;margin-bottom:2px;">ВЛАСНИК</div>
-            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.08em;">${(user.name||user.email||'').toUpperCase()}</div>
-          </div>
-          <!-- Термін -->
-          <div style="position:absolute;bottom:26px;right:60px;text-align:right;">
-            <div style="font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.08em;margin-bottom:2px;">VALID THRU</div>
-            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,.6);">09/27</div>
-          </div>
-        </div>
-      `;
+    function applyAvatar(dataUrl) {
+      const imgHtml = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+      document.getElementById('user-avatar').innerHTML = imgHtml;
+      document.getElementById('menu-avatar').innerHTML = imgHtml;
     }
 
-    if (c.type === 'premium') {
-      return `
-        <div style="
-          min-width:100%;flex-shrink:0;
-          height:190px;border-radius:18px;position:relative;overflow:hidden;
-          background:linear-gradient(150deg,#1a0f08 0%,#2d1a0a 35%,#1a0f08 70%,#0f0a06 100%);
-          border:1px solid rgba(255,120,30,.4);
-          box-shadow:0 0 40px rgba(200,80,10,.25),0 0 0 1px rgba(255,120,30,.1);
-        ">
-          <!-- Світлові хвилі -->
-          <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 340 190" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="transparent"/>
-                <stop offset="40%" stop-color="#ff7010" stop-opacity=".9"/>
-                <stop offset="60%" stop-color="#ffb040" stop-opacity=".7"/>
-                <stop offset="100%" stop-color="transparent"/>
-              </linearGradient>
-              <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="transparent"/>
-                <stop offset="50%" stop-color="#d36000" stop-opacity=".5"/>
-                <stop offset="100%" stop-color="transparent"/>
-              </linearGradient>
-              <filter id="glow2"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            </defs>
-            <path d="M-20 150 Q60 50 160 95 Q240 135 360 40" stroke="url(#wave1)" stroke-width="4" fill="none" filter="url(#glow2)" stroke-linecap="round"/>
-            <path d="M-20 160 Q60 60 160 105 Q240 145 360 50" stroke="url(#wave2)" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <path d="M-20 170 Q80 120 170 140 Q260 160 370 110" stroke="#ff8020" stroke-width="1.5" fill="none" opacity=".3" stroke-linecap="round"/>
-            <ellipse cx="160" cy="200" rx="120" ry="40" fill="#ff6010" opacity=".12"/>
-          </svg>
-          <!-- Чип -->
-          <div style="position:absolute;top:28px;left:24px;">
-            <svg width="38" height="30" viewBox="0 0 38 30">
-              <rect width="38" height="30" rx="4" fill="#c8920a" opacity=".95"/>
-              <rect x="4" y="4" width="30" height="22" rx="3" fill="none" stroke="#8a6a06" stroke-width="1"/>
-              <line x1="13" y1="0" x2="13" y2="30" stroke="#8a6a06" stroke-width=".8"/>
-              <line x1="25" y1="0" x2="25" y2="30" stroke="#8a6a06" stroke-width=".8"/>
-              <line x1="0" y1="10" x2="38" y2="10" stroke="#8a6a06" stroke-width=".8"/>
-              <line x1="0" y1="20" x2="38" y2="20" stroke="#8a6a06" stroke-width=".8"/>
-            </svg>
-          </div>
-          <!-- Назва -->
-          <div style="position:absolute;top:22px;right:20px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#ff8030;letter-spacing:.1em;text-shadow:0 0 10px rgba(255,120,30,.6);">BankHUB</div>
-          <!-- Лого -->
-          <div style="position:absolute;bottom:20px;right:18px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(255,140,40,.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(255,120,30,.4);">
-            <span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#ff9040;text-shadow:0 0 8px rgba(255,140,40,.8);">B</span>
-          </div>
-          <!-- Баланс -->
-          <div style="position:absolute;top:78px;left:24px;">
-            <div style="font-size:9px;color:rgba(255,200,100,.5);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px;">Баланс</div>
-            <div class="mini-card-balance" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#ff9030;text-shadow:0 0 16px rgba(255,120,30,.6);">${balance}</div>
-          </div>
-          <!-- Власник -->
-          <div style="position:absolute;bottom:24px;left:24px;">
-            <div style="font-size:9px;color:rgba(255,180,80,.4);letter-spacing:.1em;margin-bottom:2px;">ВЛАСНИК</div>
-            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,120,.8);letter-spacing:.08em;">${(user.name||user.email||'').toUpperCase()}</div>
-          </div>
-          <!-- Термін -->
-          <div style="position:absolute;bottom:24px;right:64px;text-align:right;">
-            <div style="font-size:9px;color:rgba(255,180,80,.4);letter-spacing:.08em;margin-bottom:2px;">VALID THRU</div>
-            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,120,.7);">09/27</div>
-          </div>
-        </div>
-      `;
-    }
+    // ── Оновлення UI ──
+    function updateUI() {
+      const name = user.name || user.email || 'U';
+      const letter = name[0].toUpperCase();
 
-    // pikmi
-    if (c.type === 'pikmi') {
-      return `
-        <div style="
-          min-width:100%;flex-shrink:0;
-          height:190px;border-radius:18px;position:relative;overflow:hidden;
-          background:linear-gradient(135deg,#200a1a 0%,#3a1030 45%,#280d22 100%);
-          border:1px solid rgba(255,120,190,.5);
-          box-shadow:0 0 40px rgba(255,80,160,.25),inset 0 0 40px rgba(180,0,100,.1);
-        ">
-          <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 340 190">
-            <defs>
-              <linearGradient id="pk1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="transparent"/>
-                <stop offset="30%" stop-color="#ff4da6" stop-opacity=".9"/>
-                <stop offset="60%" stop-color="#ffaadd" stop-opacity=".8"/>
-                <stop offset="100%" stop-color="transparent"/>
-              </linearGradient>
-              <radialGradient id="diamond" cx="50%" cy="30%" r="70%">
-                <stop offset="0%" stop-color="#fff" stop-opacity=".95"/>
-                <stop offset="40%" stop-color="#ffccee" stop-opacity=".8"/>
-                <stop offset="100%" stop-color="#cc88bb" stop-opacity=".6"/>
-              </radialGradient>
-              <filter id="pglow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-              <filter id="dshine"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            </defs>
-            <!-- Рожева хвиля -->
-            <path d="M-10 115 Q70 55 165 88 Q255 118 360 52" stroke="url(#pk1)" stroke-width="4.5" fill="none" filter="url(#pglow)" stroke-linecap="round"/>
-            <path d="M-10 125 Q70 65 165 98 Q255 128 360 62" stroke="#ff60b0" stroke-width="1.5" fill="none" opacity=".3" stroke-linecap="round"/>
-            <!-- SLAY знак -->
-            <polygon points="248,22 262,22 270,30 270,44 262,52 248,52 240,44 240,30" fill="#c0105a" stroke="#ff80c0" stroke-width="1.5" opacity=".9"/>
-            <polygon points="250,25 260,25 267,32 267,42 260,49 250,49 243,42 243,32" fill="none" stroke="#ffb8d8" stroke-width=".6" opacity=".6"/>
-            <text x="255" y="41" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="9" font-weight="900" fill="#ffddee">SLAY</text>
-            <!-- Стрази великі -->
-            <polygon points="22,12 25,18 22,24 19,18" fill="url(#diamond)" filter="url(#dshine)" opacity=".95"/>
-            <polygon points="310,15 314,22 310,29 306,22" fill="url(#diamond)" filter="url(#dshine)" opacity=".9"/>
-            <polygon points="155,8 158,14 155,20 152,14" fill="url(#diamond)" opacity=".85"/>
-            <polygon points="85,170 88,176 85,182 82,176" fill="url(#diamond)" opacity=".9"/>
-            <polygon points="270,165 273,171 270,177 267,171" fill="url(#diamond)" opacity=".85"/>
-            <polygon points="330,130 333,136 330,142 327,136" fill="url(#diamond)" opacity=".8"/>
-            <polygon points="12,80 15,86 12,92 9,86" fill="url(#diamond)" opacity=".75"/>
-            <!-- Стрази середні -->
-            <polygon points="60,18 62,23 60,28 58,23" fill="url(#diamond)" opacity=".8"/>
-            <polygon points="200,12 202,16 200,20 198,16" fill="url(#diamond)" opacity=".75"/>
-            <polygon points="290,55 292,59 290,63 288,59" fill="url(#diamond)" opacity=".7"/>
-            <polygon points="40,140 42,144 40,148 38,144" fill="url(#diamond)" opacity=".75"/>
-            <polygon points="180,175 182,179 180,183 178,179" fill="url(#diamond)" opacity=".8"/>
-            <polygon points="320,70 322,74 320,78 318,74" fill="url(#diamond)" opacity=".7"/>
-            <polygon points="110,5 112,9 110,13 108,9" fill="url(#diamond)" opacity=".7"/>
-            <polygon points="230,180 232,184 230,188 228,184" fill="url(#diamond)" opacity=".75"/>
-            <!-- Стрази маленькі -->
-            <circle cx="45" cy="35" r="2" fill="#fff" opacity=".7"/>
-            <circle cx="130" cy="28" r="1.5" fill="#ffccee" opacity=".8"/>
-            <circle cx="245" cy="8" r="1.8" fill="#fff" opacity=".65"/>
-            <circle cx="335" cy="50" r="1.5" fill="#ffccee" opacity=".7"/>
-            <circle cx="75" cy="155" r="2" fill="#fff" opacity=".65"/>
-            <circle cx="140" cy="182" r="1.5" fill="#ffccee" opacity=".7"/>
-            <circle cx="305" cy="180" r="1.8" fill="#fff" opacity=".6"/>
-            <circle cx="18" cy="50" r="1.5" fill="#ffccee" opacity=".65"/>
-            <circle cx="338" cy="100" r="1.2" fill="#fff" opacity=".6"/>
-            <circle cx="170" cy="3" r="1.2" fill="#ffccee" opacity=".7"/>
-            <!-- Серця -->
-            <text x="28" y="100" font-size="11" fill="#ff80c0" opacity=".7">♥</text>
-            <text x="295" y="105" font-size="9" fill="#ffb8d8" opacity=".6">♥</text>
-            <text x="120" y="185" font-size="8" fill="#ff80c0" opacity=".55">♥</text>
-            <text x="340" y="160" font-size="7" fill="#ffb8d8" opacity=".5">♥</text>
-            <text x="5" y="130" font-size="7" fill="#ff80c0" opacity=".5">♥</text>
-            <!-- Бантик -->
-            <ellipse cx="32" cy="168" rx="10" ry="6" fill="#ff4da6" opacity=".7" transform="rotate(-20,32,168)"/>
-            <ellipse cx="50" cy="168" rx="10" ry="6" fill="#ff4da6" opacity=".7" transform="rotate(20,50,168)"/>
-            <ellipse cx="41" cy="168" rx="5" ry="4" fill="#ff80c0" opacity=".85"/>
-            <circle cx="41" cy="168" r="2.5" fill="#ffb8d8" opacity=".9"/>
-            <path d="M35 172 Q28 180 22 178" stroke="#ff4da6" stroke-width="1.5" fill="none" opacity=".6"/>
-            <path d="M47 172 Q54 180 60 178" stroke="#ff4da6" stroke-width="1.5" fill="none" opacity=".6"/>
-            <!-- Іскри -->
-            <path d="M100 20 L101 17 L102 20 L105 21 L102 22 L101 25 L100 22 L97 21Z" fill="#fff" opacity=".7"/>
-            <path d="M220 170 L221 167 L222 170 L225 171 L222 172 L221 175 L220 172 L217 171Z" fill="#fff" opacity=".6"/>
-            <path d="M335 25 L336 23 L337 25 L339 26 L337 27 L336 29 L335 27 L333 26Z" fill="#fff" opacity=".65"/>
-            <path d="M15 170 L16 168 L17 170 L19 171 L17 172 L16 174 L15 172 L13 171Z" fill="#ffccee" opacity=".6"/>
-          </svg>
-          <!-- Чип -->
-          <div style="position:absolute;top:26px;left:24px;">
-            <svg width="36" height="28" viewBox="0 0 38 30">
-              <rect width="38" height="30" rx="4" fill="#cc6090" opacity=".9"/>
-              <rect x="4" y="4" width="30" height="22" rx="3" fill="none" stroke="#ffb8d8" stroke-width="1"/>
-              <line x1="13" y1="0" x2="13" y2="30" stroke="#ffb8d8" stroke-width=".7"/>
-              <line x1="25" y1="0" x2="25" y2="30" stroke="#ffb8d8" stroke-width=".7"/>
-              <line x1="0" y1="10" x2="38" y2="10" stroke="#ffb8d8" stroke-width=".7"/>
-              <line x1="0" y1="20" x2="38" y2="20" stroke="#ffb8d8" stroke-width=".7"/>
-            </svg>
-          </div>
-          <!-- ПІКМІ КАРТКА -->
-          <div style="position:absolute;top:20px;left:70px;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:#ffb8d8;letter-spacing:.12em;text-shadow:0 0 10px rgba(255,100,180,.8);">ПІКМІ КАРТКА</div>
-          <!-- BankHUB вертикально -->
-          <div style="position:absolute;top:60px;right:16px;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:#ff80c0;letter-spacing:.08em;text-shadow:0 0 8px rgba(255,100,180,.6);writing-mode:vertical-rl;text-orientation:mixed;opacity:.7;">BankHUB</div>
-          <!-- Баланс -->
-          <div style="position:absolute;top:82px;left:24px;">
-            <div style="font-size:9px;color:rgba(255,180,220,.5);letter-spacing:.15em;text-transform:uppercase;margin-bottom:3px;">Баланс</div>
-            <div class="mini-card-balance" style="font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:#ff80c0;text-shadow:0 0 16px rgba(255,80,160,.7);">${balance}</div>
-          </div>
-          <!-- Власник -->
-          <div style="position:absolute;bottom:22px;left:24px;">
-            <div style="font-size:9px;color:rgba(255,180,220,.4);letter-spacing:.1em;margin-bottom:2px;">ВЛАСНИК</div>
-            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,230,.85);letter-spacing:.08em;">${(user.name||user.email||'').toUpperCase()}</div>
-          </div>
-          <!-- Термін -->
-          <div style="position:absolute;bottom:22px;right:22px;text-align:right;">
-            <div style="font-size:9px;color:rgba(255,180,220,.4);letter-spacing:.08em;margin-bottom:2px;">VALID THRU</div>
-            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,230,.7);">09/27</div>
-          </div>
-        </div>
-      `;
-    }
+      const savedAvatar = getSavedAvatar();
+      if (savedAvatar) {
+        applyAvatar(savedAvatar);
+      } else {
+        document.getElementById('user-avatar').textContent = letter;
+        document.getElementById('menu-avatar').textContent = letter;
+      }
 
-    // virtual
-    return `
+      document.getElementById('menu-name').textContent = user.name || '';
+      document.getElementById('menu-email').textContent = user.email || '';
+    }
+    updateUI();
+
+    // ── Слайдер карток ──
+    const CARDS_KEY = `bank_cards_${user?.id}`;
+
+    const cardThemes = {
+      standard: { label: 'Standard',  color: '#d36922' },
+      premium:  { label: 'Premium',   color: '#ff8c2a' },
+      virtual:  { label: 'Virtual',   color: '#ffa040' },
+      pikmi:    { label: 'Pick-me',   color: '#ff80c0' },
+    };
+
+    function cardInnerHTML(c, balance, i) {
+      const theme = cardThemes[c.type] || cardThemes.standard;
+
+      if (c.type === 'standard') {
+        return `
       <div style="
         min-width:100%;flex-shrink:0;
         height:190px;border-radius:18px;position:relative;overflow:hidden;
-        background:linear-gradient(150deg,#0e0c08 0%,#1e1508 35%,#120e06 70%,#0a0806 100%);
-        border:1px solid rgba(255,140,20,.35);
-        box-shadow:0 0 40px rgba(180,80,0,.2);
+        background:linear-gradient(160deg,#1c1c1c 0%,#2a2520 40%,#1a1714 100%);
+        border:1px solid rgba(211,105,34,.35);
+        box-shadow:0 0 32px rgba(0,0,0,.6);
       ">
-        <!-- Схема плати -->
-        <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.18" viewBox="0 0 340 190">
-          <g stroke="#ff9020" stroke-width=".8" fill="none">
-            <line x1="20" y1="0" x2="20" y2="190"/><line x1="60" y1="0" x2="60" y2="190"/>
-            <line x1="100" y1="0" x2="100" y2="190"/><line x1="140" y1="0" x2="140" y2="190"/>
-            <line x1="200" y1="0" x2="200" y2="190"/><line x1="260" y1="0" x2="260" y2="190"/>
-            <line x1="310" y1="0" x2="310" y2="190"/>
-            <line x1="0" y1="40" x2="340" y2="40"/><line x1="0" y1="90" x2="340" y2="90"/>
-            <line x1="0" y1="140" x2="340" y2="140"/>
-            <circle cx="60" cy="40" r="3" fill="#ff9020"/><circle cx="140" cy="90" r="3" fill="#ff9020"/>
-            <circle cx="200" cy="40" r="3" fill="#ff9020"/><circle cx="260" cy="140" r="3" fill="#ff9020"/>
-            <circle cx="310" cy="90" r="2" fill="#ff9020"/>
-            <path d="M60 40 L100 40 L100 90 L140 90"/><path d="M200 40 L200 90 L260 90 L260 140"/>
-          </g>
-        </svg>
-        <!-- Вихрові лінії -->
-        <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 340 190" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="vw1" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="transparent"/>
-              <stop offset="30%" stop-color="#ff7010" stop-opacity=".8"/>
-              <stop offset="55%" stop-color="#ffb040" stop-opacity=".6"/>
-              <stop offset="100%" stop-color="transparent"/>
-            </linearGradient>
-            <filter id="vglow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <path d="M30 180 Q80 100 140 120 Q200 140 220 80 Q240 30 310 50" stroke="url(#vw1)" stroke-width="3.5" fill="none" filter="url(#vglow)" stroke-linecap="round"/>
-          <path d="M20 190 Q90 115 150 130 Q210 150 230 90 Q250 40 320 60" stroke="#d05008" stroke-width="1.5" fill="none" opacity=".4" stroke-linecap="round"/>
-          <ellipse cx="80" cy="170" rx="60" ry="25" fill="#ff6010" opacity=".1"/>
+        <!-- Хвиля -->
+        <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.55" viewBox="0 0 340 190" preserveAspectRatio="none">
+          <path d="M-10 130 Q80 60 180 110 Q280 160 360 80" stroke="#c8601a" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M-10 140 Q80 70 180 120 Q280 170 360 90" stroke="#a04010" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"/>
         </svg>
         <!-- Чип -->
         <div style="position:absolute;top:28px;left:24px;">
           <svg width="38" height="30" viewBox="0 0 38 30">
-            <rect width="38" height="30" rx="4" fill="#b8820a" opacity=".9"/>
-            <rect x="4" y="4" width="30" height="22" rx="3" fill="none" stroke="#8a6006" stroke-width="1"/>
-            <line x1="13" y1="0" x2="13" y2="30" stroke="#8a6006" stroke-width=".8"/>
-            <line x1="25" y1="0" x2="25" y2="30" stroke="#8a6006" stroke-width=".8"/>
-            <line x1="0" y1="10" x2="38" y2="10" stroke="#8a6006" stroke-width=".8"/>
-            <line x1="0" y1="20" x2="38" y2="20" stroke="#8a6006" stroke-width=".8"/>
+            <rect width="38" height="30" rx="4" fill="#b8920a" opacity=".9"/>
+            <rect x="4" y="4" width="30" height="22" rx="3" fill="none" stroke="#8a6a06" stroke-width="1"/>
+            <line x1="13" y1="0" x2="13" y2="30" stroke="#8a6a06" stroke-width=".8"/>
+            <line x1="25" y1="0" x2="25" y2="30" stroke="#8a6a06" stroke-width=".8"/>
+            <line x1="0" y1="10" x2="38" y2="10" stroke="#8a6a06" stroke-width=".8"/>
+            <line x1="0" y1="20" x2="38" y2="20" stroke="#8a6a06" stroke-width=".8"/>
+          </svg>
+        </div>
+        <!-- Назва банку -->
+        <div style="position:absolute;top:24px;right:20px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#d36922;letter-spacing:.12em;">BankHUB</div>
+        <!-- Лого -->
+        <div style="position:absolute;bottom:22px;right:20px;width:36px;height:36px;border-radius:50%;border:2px solid rgba(211,105,34,.6);display:flex;align-items:center;justify-content:center;">
+          <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#d36922;">B</span>
+        </div>
+        <!-- Баланс -->
+        <div style="position:absolute;top:80px;left:24px;">
+          <div style="font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px;">Баланс</div>
+          <div class="mini-card-balance" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#e07830;text-shadow:0 0 12px rgba(211,105,34,.4);">${balance}</div>
+        </div>
+        <!-- Власник -->
+        <div style="position:absolute;bottom:26px;left:24px;">
+          <div style="font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.1em;margin-bottom:2px;">ВЛАСНИК</div>
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.08em;">${(user.name||user.email||'').toUpperCase()}</div>
+        </div>
+        <!-- Термін -->
+        <div style="position:absolute;bottom:26px;right:60px;text-align:right;">
+          <div style="font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.08em;margin-bottom:2px;">VALID THRU</div>
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,.6);">09/27</div>
+        </div>
+      </div>
+    `;
+      }
+
+      if (c.type === 'premium') {
+        return `
+      <div style="
+        min-width:100%;flex-shrink:0;
+        height:190px;border-radius:18px;position:relative;overflow:hidden;
+        background:linear-gradient(150deg,#1a0f08 0%,#2d1a0a 35%,#1a0f08 70%,#0f0a06 100%);
+        border:1px solid rgba(255,120,30,.4);
+        box-shadow:0 0 40px rgba(200,80,10,.25),0 0 0 1px rgba(255,120,30,.1);
+      ">
+        <!-- Світлові хвилі -->
+        <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 340 190" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="transparent"/>
+              <stop offset="40%" stop-color="#ff7010" stop-opacity=".9"/>
+              <stop offset="60%" stop-color="#ffb040" stop-opacity=".7"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </linearGradient>
+            <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="transparent"/>
+              <stop offset="50%" stop-color="#d36000" stop-opacity=".5"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </linearGradient>
+            <filter id="glow2"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path d="M-20 150 Q60 50 160 95 Q240 135 360 40" stroke="url(#wave1)" stroke-width="4" fill="none" filter="url(#glow2)" stroke-linecap="round"/>
+          <path d="M-20 160 Q60 60 160 105 Q240 145 360 50" stroke="url(#wave2)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M-20 170 Q80 120 170 140 Q260 160 370 110" stroke="#ff8020" stroke-width="1.5" fill="none" opacity=".3" stroke-linecap="round"/>
+          <ellipse cx="160" cy="200" rx="120" ry="40" fill="#ff6010" opacity=".12"/>
+        </svg>
+        <!-- Чип -->
+        <div style="position:absolute;top:28px;left:24px;">
+          <svg width="38" height="30" viewBox="0 0 38 30">
+            <rect width="38" height="30" rx="4" fill="#c8920a" opacity=".95"/>
+            <rect x="4" y="4" width="30" height="22" rx="3" fill="none" stroke="#8a6a06" stroke-width="1"/>
+            <line x1="13" y1="0" x2="13" y2="30" stroke="#8a6a06" stroke-width=".8"/>
+            <line x1="25" y1="0" x2="25" y2="30" stroke="#8a6a06" stroke-width=".8"/>
+            <line x1="0" y1="10" x2="38" y2="10" stroke="#8a6a06" stroke-width=".8"/>
+            <line x1="0" y1="20" x2="38" y2="20" stroke="#8a6a06" stroke-width=".8"/>
           </svg>
         </div>
         <!-- Назва -->
-        <div style="position:absolute;top:22px;right:20px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#ff8020;letter-spacing:.1em;text-shadow:0 0 12px rgba(255,120,20,.7);">BankHUB</div>
+        <div style="position:absolute;top:22px;right:20px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#ff8030;letter-spacing:.1em;text-shadow:0 0 10px rgba(255,120,30,.6);">BankHUB</div>
         <!-- Лого -->
-        <div style="position:absolute;bottom:20px;left:22px;width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,140,20,.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(255,100,10,.4),inset 0 0 10px rgba(255,100,10,.2);">
-          <span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#ff9030;text-shadow:0 0 10px rgba(255,140,20,.9);">B</span>
+        <div style="position:absolute;bottom:20px;right:18px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(255,140,40,.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(255,120,30,.4);">
+          <span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#ff9040;text-shadow:0 0 8px rgba(255,140,40,.8);">B</span>
         </div>
         <!-- Баланс -->
         <div style="position:absolute;top:78px;left:24px;">
-          <div style="font-size:9px;color:rgba(255,180,60,.5);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px;">Баланс</div>
-          <div class="mini-card-balance" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#ff9030;text-shadow:0 0 18px rgba(255,120,20,.7);">${balance}</div>
+          <div style="font-size:9px;color:rgba(255,200,100,.5);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px;">Баланс</div>
+          <div class="mini-card-balance" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#ff9030;text-shadow:0 0 16px rgba(255,120,30,.6);">${balance}</div>
         </div>
         <!-- Власник -->
-        <div style="position:absolute;bottom:26px;right:20px;text-align:right;">
-          <div style="font-size:9px;color:rgba(255,180,60,.4);letter-spacing:.1em;margin-bottom:2px;">ВЛАСНИК</div>
-          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,100,.8);letter-spacing:.08em;">${(user.name||user.email||'').toUpperCase()}</div>
+        <div style="position:absolute;bottom:24px;left:24px;">
+          <div style="font-size:9px;color:rgba(255,180,80,.4);letter-spacing:.1em;margin-bottom:2px;">ВЛАСНИК</div>
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,120,.8);letter-spacing:.08em;">${(user.name||user.email||'').toUpperCase()}</div>
         </div>
         <!-- Термін -->
-        <div style="position:absolute;top:78px;right:20px;text-align:right;">
-          <div style="font-size:9px;color:rgba(255,180,60,.4);letter-spacing:.08em;margin-bottom:2px;">VALID THRU</div>
-          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,100,.7);">09/27</div>
+        <div style="position:absolute;bottom:24px;right:64px;text-align:right;">
+          <div style="font-size:9px;color:rgba(255,180,80,.4);letter-spacing:.08em;margin-bottom:2px;">VALID THRU</div>
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,120,.7);">09/27</div>
         </div>
       </div>
     `;
-  }
+      }
 
-  function loadCards() {
-    try { return JSON.parse(localStorage.getItem(CARDS_KEY)) || []; } catch { return []; }
-  }
-  function saveCards(cards) {
-    localStorage.setItem(CARDS_KEY, JSON.stringify(cards));
-  }
+      // pikmi
+      if (c.type === 'pikmi') {
+        return `
+      <div style="
+        min-width:100%;flex-shrink:0;
+        height:190px;border-radius:18px;position:relative;overflow:hidden;
+        background:linear-gradient(135deg,#200a1a 0%,#3a1030 45%,#280d22 100%);
+        border:1px solid rgba(255,120,190,.5);
+        box-shadow:0 0 40px rgba(255,80,160,.25),inset 0 0 40px rgba(180,0,100,.1);
+      ">
+        <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 340 190">
+          <defs>
+            <linearGradient id="pk1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="transparent"/>
+              <stop offset="30%" stop-color="#ff4da6" stop-opacity=".9"/>
+              <stop offset="60%" stop-color="#ffaadd" stop-opacity=".8"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </linearGradient>
+            <radialGradient id="diamond" cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#fff" stop-opacity=".95"/>
+              <stop offset="40%" stop-color="#ffccee" stop-opacity=".8"/>
+              <stop offset="100%" stop-color="#cc88bb" stop-opacity=".6"/>
+            </radialGradient>
+            <filter id="pglow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="dshine"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- Рожева хвиля -->
+          <path d="M-10 115 Q70 55 165 88 Q255 118 360 52" stroke="url(#pk1)" stroke-width="4.5" fill="none" filter="url(#pglow)" stroke-linecap="round"/>
+          <path d="M-10 125 Q70 65 165 98 Q255 128 360 62" stroke="#ff60b0" stroke-width="1.5" fill="none" opacity=".3" stroke-linecap="round"/>
+          <!-- SLAY знак -->
+          <polygon points="248,22 262,22 270,30 270,44 262,52 248,52 240,44 240,30" fill="#c0105a" stroke="#ff80c0" stroke-width="1.5" opacity=".9"/>
+          <polygon points="250,25 260,25 267,32 267,42 260,49 250,49 243,42 243,32" fill="none" stroke="#ffb8d8" stroke-width=".6" opacity=".6"/>
+          <text x="255" y="41" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="9" font-weight="900" fill="#ffddee">SLAY</text>
+          <!-- Стрази великі -->
+          <polygon points="22,12 25,18 22,24 19,18" fill="url(#diamond)" filter="url(#dshine)" opacity=".95"/>
+          <polygon points="310,15 314,22 310,29 306,22" fill="url(#diamond)" filter="url(#dshine)" opacity=".9"/>
+          <polygon points="155,8 158,14 155,20 152,14" fill="url(#diamond)" opacity=".85"/>
+          <polygon points="85,170 88,176 85,182 82,176" fill="url(#diamond)" opacity=".9"/>
+          <polygon points="270,165 273,171 270,177 267,171" fill="url(#diamond)" opacity=".85"/>
+          <polygon points="330,130 333,136 330,142 327,136" fill="url(#diamond)" opacity=".8"/>
+          <polygon points="12,80 15,86 12,92 9,86" fill="url(#diamond)" opacity=".75"/>
+          <!-- Стрази середні -->
+          <polygon points="60,18 62,23 60,28 58,23" fill="url(#diamond)" opacity=".8"/>
+          <polygon points="200,12 202,16 200,20 198,16" fill="url(#diamond)" opacity=".75"/>
+          <polygon points="290,55 292,59 290,63 288,59" fill="url(#diamond)" opacity=".7"/>
+          <polygon points="40,140 42,144 40,148 38,144" fill="url(#diamond)" opacity=".75"/>
+          <polygon points="180,175 182,179 180,183 178,179" fill="url(#diamond)" opacity=".8"/>
+          <polygon points="320,70 322,74 320,78 318,74" fill="url(#diamond)" opacity=".7"/>
+          <polygon points="110,5 112,9 110,13 108,9" fill="url(#diamond)" opacity=".7"/>
+          <polygon points="230,180 232,184 230,188 228,184" fill="url(#diamond)" opacity=".75"/>
+          <!-- Стрази маленькі -->
+          <circle cx="45" cy="35" r="2" fill="#fff" opacity=".7"/>
+          <circle cx="130" cy="28" r="1.5" fill="#ffccee" opacity=".8"/>
+          <circle cx="245" cy="8" r="1.8" fill="#fff" opacity=".65"/>
+          <circle cx="335" cy="50" r="1.5" fill="#ffccee" opacity=".7"/>
+          <circle cx="75" cy="155" r="2" fill="#fff" opacity=".65"/>
+          <circle cx="140" cy="182" r="1.5" fill="#ffccee" opacity=".7"/>
+          <circle cx="305" cy="180" r="1.8" fill="#fff" opacity=".6"/>
+          <circle cx="18" cy="50" r="1.5" fill="#ffccee" opacity=".65"/>
+          <circle cx="338" cy="100" r="1.2" fill="#fff" opacity=".6"/>
+          <circle cx="170" cy="3" r="1.2" fill="#ffccee" opacity=".7"/>
+          <!-- Серця -->
+          <text x="28" y="100" font-size="11" fill="#ff80c0" opacity=".7">♥</text>
+          <text x="295" y="105" font-size="9" fill="#ffb8d8" opacity=".6">♥</text>
+          <text x="120" y="185" font-size="8" fill="#ff80c0" opacity=".55">♥</text>
+          <text x="340" y="160" font-size="7" fill="#ffb8d8" opacity=".5">♥</text>
+          <text x="5" y="130" font-size="7" fill="#ff80c0" opacity=".5">♥</text>
+          <!-- Бантик -->
+          <ellipse cx="32" cy="168" rx="10" ry="6" fill="#ff4da6" opacity=".7" transform="rotate(-20,32,168)"/>
+          <ellipse cx="50" cy="168" rx="10" ry="6" fill="#ff4da6" opacity=".7" transform="rotate(20,50,168)"/>
+          <ellipse cx="41" cy="168" rx="5" ry="4" fill="#ff80c0" opacity=".85"/>
+          <circle cx="41" cy="168" r="2.5" fill="#ffb8d8" opacity=".9"/>
+          <path d="M35 172 Q28 180 22 178" stroke="#ff4da6" stroke-width="1.5" fill="none" opacity=".6"/>
+          <path d="M47 172 Q54 180 60 178" stroke="#ff4da6" stroke-width="1.5" fill="none" opacity=".6"/>
+          <!-- Іскри -->
+          <path d="M100 20 L101 17 L102 20 L105 21 L102 22 L101 25 L100 22 L97 21Z" fill="#fff" opacity=".7"/>
+          <path d="M220 170 L221 167 L222 170 L225 171 L222 172 L221 175 L220 172 L217 171Z" fill="#fff" opacity=".6"/>
+          <path d="M335 25 L336 23 L337 25 L339 26 L337 27 L336 29 L335 27 L333 26Z" fill="#fff" opacity=".65"/>
+          <path d="M15 170 L16 168 L17 170 L19 171 L17 172 L16 174 L15 172 L13 171Z" fill="#ffccee" opacity=".6"/>
+        </svg>
+        <!-- Чип -->
+        <div style="position:absolute;top:26px;left:24px;">
+          <svg width="36" height="28" viewBox="0 0 38 30">
+            <rect width="38" height="30" rx="4" fill="#cc6090" opacity=".9"/>
+            <rect x="4" y="4" width="30" height="22" rx="3" fill="none" stroke="#ffb8d8" stroke-width="1"/>
+            <line x1="13" y1="0" x2="13" y2="30" stroke="#ffb8d8" stroke-width=".7"/>
+            <line x1="25" y1="0" x2="25" y2="30" stroke="#ffb8d8" stroke-width=".7"/>
+            <line x1="0" y1="10" x2="38" y2="10" stroke="#ffb8d8" stroke-width=".7"/>
+            <line x1="0" y1="20" x2="38" y2="20" stroke="#ffb8d8" stroke-width=".7"/>
+          </svg>
+        </div>
+        <!-- ПІКМІ КАРТКА -->
+        <div style="position:absolute;top:20px;left:70px;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:#ffb8d8;letter-spacing:.12em;text-shadow:0 0 10px rgba(255,100,180,.8);">ПІКМІ КАРТКА</div>
+        <!-- BankHUB вертикально -->
+        <div style="position:absolute;top:60px;right:16px;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:#ff80c0;letter-spacing:.08em;text-shadow:0 0 8px rgba(255,100,180,.6);writing-mode:vertical-rl;text-orientation:mixed;opacity:.7;">BankHUB</div>
+        <!-- Баланс -->
+        <div style="position:absolute;top:82px;left:24px;">
+          <div style="font-size:9px;color:rgba(255,180,220,.5);letter-spacing:.15em;text-transform:uppercase;margin-bottom:3px;">Баланс</div>
+          <div class="mini-card-balance" style="font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:#ff80c0;text-shadow:0 0 16px rgba(255,80,160,.7);">${balance}</div>
+        </div>
+        <!-- Власник -->
+        <div style="position:absolute;bottom:22px;left:24px;">
+          <div style="font-size:9px;color:rgba(255,180,220,.4);letter-spacing:.1em;margin-bottom:2px;">ВЛАСНИК</div>
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,230,.85);letter-spacing:.08em;">${(user.name||user.email||'').toUpperCase()}</div>
+        </div>
+        <!-- Термін -->
+        <div style="position:absolute;bottom:22px;right:22px;text-align:right;">
+          <div style="font-size:9px;color:rgba(255,180,220,.4);letter-spacing:.08em;margin-bottom:2px;">VALID THRU</div>
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,230,.7);">09/27</div>
+        </div>
+      </div>
+    `;
+      }
 
-  let cards = loadCards();
-  if (!cards.length) {
-    cards = [{ type: 'premium', label: 'Premium Black' }];
-    saveCards(cards);
-  }
-
-  let currentCard = 0;
-
-  function getBalance() {
-    const accounts = getAccounts();
-    const acc = accounts.find(a => a.userId === user?.id);
-    return acc ? Number(acc.balance).toFixed(2) + ' ₴' : '0.00 ₴';
-  }
-
-  function renderSlider() {
-    const slider = document.getElementById('cards-slider');
-    const dots = document.getElementById('cards-dots');
-    const balance = getBalance();
-
-    slider.innerHTML = cards.map((c, i) => cardInnerHTML(c, balance, i)).join('');
-
-    dots.innerHTML = cards.map((_, i) =>
-      `<button class="s-dot ${i === currentCard ? 'active' : ''}" data-i="${i}"></button>`
-    ).join('');
-
-    slider.style.transform = `translateX(-${currentCard * 100}%)`;
-
-    dots.querySelectorAll('.s-dot').forEach(d => {
-      d.addEventListener('click', () => {
-        currentCard = +d.dataset.i;
-        renderSlider();
-      });
-    });
-  }
-
-  renderSlider();
-
-  // ── Баланс ──
-  function updateBalance() {
-    const balance = getBalance();
-    document.querySelectorAll('.mini-card-balance').forEach(el => el.textContent = balance);
-  }
-  updateBalance();
-
-  // ── Транзакції ──
-  function updateTransactions() {
-    const transactions = getTransactions();
-    const list = document.getElementById('transactions-list');
-    if (!transactions.length) {
-      list.innerHTML = '<p class="dash-tx-empty">Транзакцій поки немає</p>';
-      return;
-    }
-    list.innerHTML = transactions.slice().reverse().map(t => {
-      const isIncome = t.toId === user?.id || t.type === 'income';
+      // virtual
       return `
-        <div class="dash-tx-item ${isIncome ? 'income' : 'expense'}">
-          <div class="dash-tx-icon ${isIncome ? 'income' : 'expense'}">${isIncome ? '↑' : '↓'}</div>
-          <div class="dash-tx-info">
-            <div class="dash-tx-name">${t.category || 'Транзакція'}</div>
-            <div class="dash-tx-date">${t.date ? new Date(t.date).toLocaleDateString('uk-UA') : ''}</div>
-          </div>
-          <div class="dash-tx-amount ${isIncome ? 'income' : 'expense'}">${isIncome ? '+' : '-'}${Number(t.amount).toFixed(2)} ₴</div>
-        </div>
-      `;
-    }).join('');
-  }
-  updateTransactions();
-
-  // ── Кешбек (1% від витрат) ──
-  function calcCashback() {
-    const transactions = getTransactions();
-    const total = transactions
-      .filter(t => t.toId !== user?.id)
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-    return (total * 0.01).toFixed(2);
-  }
-
-  // ── EventBus ──
-  eventBus.subscribe('accounts:updated', () => updateBalance());
-  eventBus.subscribe('transactions:updated', () => updateTransactions());
-
-  // ── Меню ──
-  window.toggleMenu = function() {
-    document.getElementById('profile-menu').classList.toggle('hidden');
-  };
-  document.addEventListener('click', (e) => {
-    const menu = document.getElementById('profile-menu');
-    const avatar = document.getElementById('user-avatar');
-    if (!menu.contains(e.target) && !avatar.contains(e.target)) {
-      menu.classList.add('hidden');
-    }
-  });
-
-  // ЗМІНА 3: Зберегти ім'я + аватарку (через saveCurrentUser)
-  let pendingAvatarDataUrl = null;
-
-  document.getElementById('avatar-input').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      pendingAvatarDataUrl = ev.target.result;
-      applyAvatar(pendingAvatarDataUrl);
-    };
-    reader.readAsDataURL(file);
-  });
-
-
-  // ── Картка — показує всі картки зі слайдером ──
-  let modalCard = 0;
-
-  function renderCardModal() {
-    const slider = document.getElementById('card-modal-slider');
-    const dots   = document.getElementById('card-modal-dots');
-    const balance = getBalance();
-
-    slider.innerHTML = cards.map((c) => {
-      return cardInnerHTML(c, balance, 0).replace(/min-width:100%/g, 'min-width:320px');
-    }).join('');
-
-    slider.style.transform = `translateX(-${modalCard * 320}px)`;
-
-    dots.innerHTML = cards.length > 1 ? cards.map((_, i) =>
-      `<button class="s-dot ${i === modalCard ? 'active' : ''}" data-i="${i}" style="border:none;padding:0;cursor:pointer;"></button>`
-    ).join('') : '';
-
-    dots.querySelectorAll('.s-dot').forEach(d => {
-      d.addEventListener('click', () => {
-        modalCard = +d.dataset.i;
-        renderCardModal();
-      });
-    });
-  }
-
-  document.getElementById('open-card-btn').addEventListener('click', () => {
-    modalCard = currentCard;
-    renderCardModal();
-    document.getElementById('card-modal').classList.remove('hidden');
-    document.getElementById('profile-menu').classList.add('hidden');
-  });
-  window.closeCard = function() {
-    document.getElementById('card-modal').classList.add('hidden');
-  };
-
-  // ── Кешбек ──
-  document.getElementById('open-cashback-btn').addEventListener('click', () => {
-    const cb = calcCashback();
-    document.getElementById('cashback-amount').textContent = cb + ' ₴';
-    document.getElementById('cashback-modal').classList.remove('hidden');
-    document.getElementById('profile-menu').classList.add('hidden');
-  });
-  window.closeCashback = function() {
-    document.getElementById('cashback-modal').classList.add('hidden');
-  };
-
-  // ── Нова картка ──
-  let selectedCardType = 'standard';
-  document.querySelectorAll('.card-type-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      document.querySelectorAll('.card-type-option').forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-      selectedCardType = opt.dataset.type;
-    });
-  });
-
-  document.getElementById('open-new-card-btn').addEventListener('click', () => {
-    document.getElementById('new-card-inner').innerHTML = `
-      <h3>Створити нову картку</h3>
-      <div class="new-card-types" id="card-type-list">
-        <div class="card-type-option selected" data-type="standard">
-          <div class="card-type-name">⬛ Standard</div>
-          <div class="card-type-desc">Безкоштовна • Базові функції</div>
-        </div>
-        <div class="card-type-option" data-type="premium">
-          <div class="card-type-name">💳 Premium Black</div>
-          <div class="card-type-desc">99 ₴/міс • Кешбек 2% • Пріоритет</div>
-        </div>
-        <div class="card-type-option" data-type="virtual">
-          <div class="card-type-name">Virtual</div>
-          <div class="card-type-desc">Безкоштовна • Тільки онлайн</div>
-        </div>
-        <div class="card-type-option" data-type="pikmi">
-          <div class="card-type-name">Pikmi</div>
-          <div class="card-type-desc">Для справжніх пікмі • Рожева • Slay ✦</div>
-        </div>
+    <div style="
+      min-width:100%;flex-shrink:0;
+      height:190px;border-radius:18px;position:relative;overflow:hidden;
+      background:linear-gradient(150deg,#0e0c08 0%,#1e1508 35%,#120e06 70%,#0a0806 100%);
+      border:1px solid rgba(255,140,20,.35);
+      box-shadow:0 0 40px rgba(180,80,0,.2);
+    ">
+      <!-- Схема плати -->
+      <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.18" viewBox="0 0 340 190">
+        <g stroke="#ff9020" stroke-width=".8" fill="none">
+          <line x1="20" y1="0" x2="20" y2="190"/><line x1="60" y1="0" x2="60" y2="190"/>
+          <line x1="100" y1="0" x2="100" y2="190"/><line x1="140" y1="0" x2="140" y2="190"/>
+          <line x1="200" y1="0" x2="200" y2="190"/><line x1="260" y1="0" x2="260" y2="190"/>
+          <line x1="310" y1="0" x2="310" y2="190"/>
+          <line x1="0" y1="40" x2="340" y2="40"/><line x1="0" y1="90" x2="340" y2="90"/>
+          <line x1="0" y1="140" x2="340" y2="140"/>
+          <circle cx="60" cy="40" r="3" fill="#ff9020"/><circle cx="140" cy="90" r="3" fill="#ff9020"/>
+          <circle cx="200" cy="40" r="3" fill="#ff9020"/><circle cx="260" cy="140" r="3" fill="#ff9020"/>
+          <circle cx="310" cy="90" r="2" fill="#ff9020"/>
+          <path d="M60 40 L100 40 L100 90 L140 90"/><path d="M200 40 L200 90 L260 90 L260 140"/>
+        </g>
+      </svg>
+      <!-- Вихрові лінії -->
+      <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 340 190" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="vw1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="30%" stop-color="#ff7010" stop-opacity=".8"/>
+            <stop offset="55%" stop-color="#ffb040" stop-opacity=".6"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </linearGradient>
+          <filter id="vglow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path d="M30 180 Q80 100 140 120 Q200 140 220 80 Q240 30 310 50" stroke="url(#vw1)" stroke-width="3.5" fill="none" filter="url(#vglow)" stroke-linecap="round"/>
+        <path d="M20 190 Q90 115 150 130 Q210 150 230 90 Q250 40 320 60" stroke="#d05008" stroke-width="1.5" fill="none" opacity=".4" stroke-linecap="round"/>
+        <ellipse cx="80" cy="170" rx="60" ry="25" fill="#ff6010" opacity=".1"/>
+      </svg>
+      <!-- Чип -->
+      <div style="position:absolute;top:28px;left:24px;">
+        <svg width="38" height="30" viewBox="0 0 38 30">
+          <rect width="38" height="30" rx="4" fill="#b8820a" opacity=".9"/>
+          <rect x="4" y="4" width="30" height="22" rx="3" fill="none" stroke="#8a6006" stroke-width="1"/>
+          <line x1="13" y1="0" x2="13" y2="30" stroke="#8a6006" stroke-width=".8"/>
+          <line x1="25" y1="0" x2="25" y2="30" stroke="#8a6006" stroke-width=".8"/>
+          <line x1="0" y1="10" x2="38" y2="10" stroke="#8a6006" stroke-width=".8"/>
+          <line x1="0" y1="20" x2="38" y2="20" stroke="#8a6006" stroke-width=".8"/>
+        </svg>
       </div>
-      <div class="new-card-actions">
-        <button class="new-card-cancel" id="cancel-new-card">Скасувати</button>
-        <button class="new-card-confirm" id="confirm-new-card-btn">Створити</button>
+      <!-- Назва -->
+      <div style="position:absolute;top:22px;right:20px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#ff8020;letter-spacing:.1em;text-shadow:0 0 12px rgba(255,120,20,.7);">BankHUB</div>
+      <!-- Лого -->
+      <div style="position:absolute;bottom:20px;left:22px;width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,140,20,.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(255,100,10,.4),inset 0 0 10px rgba(255,100,10,.2);">
+        <span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#ff9030;text-shadow:0 0 10px rgba(255,140,20,.9);">B</span>
+      </div>
+      <!-- Баланс -->
+      <div style="position:absolute;top:78px;left:24px;">
+        <div style="font-size:9px;color:rgba(255,180,60,.5);letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px;">Баланс</div>
+        <div class="mini-card-balance" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#ff9030;text-shadow:0 0 18px rgba(255,120,20,.7);">${balance}</div>
+      </div>
+      <!-- Власник -->
+      <div style="position:absolute;bottom:26px;right:20px;text-align:right;">
+        <div style="font-size:9px;color:rgba(255,180,60,.4);letter-spacing:.1em;margin-bottom:2px;">ВЛАСНИК</div>
+        <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,100,.8);letter-spacing:.08em;">${(user.name||user.email||'').toUpperCase()}</div>
+      </div>
+      <!-- Термін -->
+      <div style="position:absolute;top:78px;right:20px;text-align:right;">
+        <div style="font-size:9px;color:rgba(255,180,60,.4);letter-spacing:.08em;margin-bottom:2px;">VALID THRU</div>
+        <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(255,200,100,.7);">09/27</div>
+      </div>
+    </div>
+  `;
+    }
+
+    function loadCards() {
+      try { 
+        return JSON.parse(localStorage.getItem(CARDS_KEY)) || []; 
+      } catch { 
+        return []; 
+      }
+    }
+    function saveCards(cards) {
+      localStorage.setItem(CARDS_KEY, JSON.stringify(cards));
+    }
+
+    let cards = loadCards();
+    if (!cards.length) {
+      cards = [{ type: 'premium', label: 'Premium Black' }];
+      saveCards(cards);
+    }
+
+    let currentCard = 0;
+
+    function getBalance() {
+      const accounts = getAccounts();
+      const acc = accounts.find((a) => a.userId === user?.id);
+      return acc ? Number(acc.balance).toFixed(2) + ' ₴' : '0.00 ₴';
+    }
+
+    function renderSlider() {
+      const slider = document.getElementById('cards-slider');
+      const dots = document.getElementById('cards-dots');
+      const balance = getBalance();
+
+      slider.innerHTML = cards
+        .map((c, i) => cardInnerHTML(c, balance, i))
+        .join('');
+
+      dots.innerHTML = cards
+        .map(
+          (_, i) =>
+            `<button class="s-dot ${i === currentCard ? 'active' : ''}" data-i="${i}"></button>`
+      )
+      .join('');
+
+      slider.style.transform = `translateX(-${currentCard * 100}%)`;
+
+      dots.querySelectorAll('.s-dot').forEach(d => {
+        d.addEventListener('click', () => {
+          currentCard = +d.dataset.i;
+          renderSlider();
+        });
+      });
+    }
+
+    renderSlider();
+
+    // ── Баланс ──
+    function updateBalance() {
+      const balance = getBalance();
+      document
+        .querySelectorAll('.mini-card-balance')
+        .forEach(el => el.textContent = balance);
+    }
+    updateBalance();
+
+    // ── Транзакції ──
+    function updateTransactions() {
+      const transactions = getTransactions();
+      const list = document.getElementById('transactions-list');
+      if (!transactions.length) {
+        list.innerHTML = '<p class="dash-tx-empty">Транзакцій поки немає</p>';
+        return;
+      }
+      list.innerHTML = transactions
+        .slice()
+        .reverse()
+        .map(t => {
+        const isIncome = t.toId === user?.id || t.type === 'income';
+        return `
+      <div class="dash-tx-item ${isIncome ? 'income' : 'expense'}">
+        <div class="dash-tx-icon ${isIncome ? 'income' : 'expense'}">${isIncome ? '↑' : '↓'}</div>
+        <div class="dash-tx-info">
+          <div class="dash-tx-name">${t.category || 'Транзакція'}</div>
+          <div class="dash-tx-date">${t.date ? new Date(t.date).toLocaleDateString('uk-UA') : ''}</div>
+        </div>
+        <div class="dash-tx-amount ${isIncome ? 'income' : 'expense'}">${isIncome ? '+' : '-'}${Number(t.amount).toFixed(2)} ₴</div>
       </div>
     `;
-    selectedCardType = 'standard';
+        })
+        .join('');
+    }
+    updateTransactions();
+
+    // ── Кешбек (1% від витрат) ──
+    function calcCashback() {
+      const transactions = getTransactions();
+      const total = transactions
+        .filter((t) => t.toId !== user?.id)
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+      return (total * 0.01).toFixed(2);
+    }
+
+    // ── EventBus ──
+    eventBus.subscribe('accounts:updated', () => updateBalance());
+    eventBus.subscribe('transactions:updated', () => updateTransactions());
+
+    // ── Меню ──
+    window.toggleMenu = function() {
+      document.getElementById('profile-menu').classList.toggle('hidden');
+    };
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('profile-menu');
+      const avatar = document.getElementById('user-avatar');
+      if (!menu.contains(e.target) && !avatar.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    // ЗМІНА 3: Зберегти ім'я + аватарку (через saveCurrentUser)
+    let pendingAvatarDataUrl = null;
+
+    document
+      .getElementById('avatar-input')
+      .addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          pendingAvatarDataUrl = ev.target.result;
+          applyAvatar(pendingAvatarDataUrl);
+        };
+        reader.readAsDataURL(file);
+      });
+
+    // ── Картка — показує всі картки зі слайдером ──
+    let modalCard = 0;
+
+    function renderCardModal() {
+      const slider = document.getElementById('card-modal-slider');
+      const dots   = document.getElementById('card-modal-dots');
+      const balance = getBalance();
+
+      slider.innerHTML = cards
+        .map((c) => {
+          return cardInnerHTML(c, balance, 0).replace(
+            /min-width:100%/g, 
+            'min-width:320px',
+          );
+        })
+        .join('');
+
+      slider.style.transform = `translateX(-${modalCard * 320}px)`;
+
+      dots.innerHTML = 
+        cards.length > 1 
+          ? cards
+            .map(
+              (_, i) =>
+                `<button class="s-dot ${i === modalCard ? 'active' : ''}" data-i="${i}" style="border:none;padding:0;cursor:pointer;"></button>`
+            )
+            .join('') 
+          : '';
+
+      dots.querySelectorAll('.s-dot').forEach(d => {
+        d.addEventListener('click', () => {
+          modalCard = +d.dataset.i;
+          renderCardModal();
+        });
+      });
+    }
+
+    document.getElementById('open-card-btn').addEventListener('click', () => {
+      modalCard = currentCard;
+      renderCardModal();
+      document.getElementById('card-modal').classList.remove('hidden');
+      document.getElementById('profile-menu').classList.add('hidden');
+    });
+    window.closeCard = function() {
+      document.getElementById('card-modal').classList.add('hidden');
+    };
+
+    // ── Кешбек ──
+    document
+      .getElementById('open-cashback-btn')
+      .addEventListener('click', () => {
+        const cb = calcCashback();
+        document.getElementById('cashback-amount').textContent = cb + ' ₴';
+        document.getElementById('cashback-modal').classList.remove('hidden');
+        document.getElementById('profile-menu').classList.add('hidden');
+      });
+    window.closeCashback = function() {
+      document.getElementById('cashback-modal').classList.add('hidden');
+    };
+
+    // ── Нова картка ──
+    let selectedCardType = 'standard';
     document.querySelectorAll('.card-type-option').forEach(opt => {
       opt.addEventListener('click', () => {
-        document.querySelectorAll('.card-type-option').forEach(o => o.classList.remove('selected'));
+        document
+          .querySelectorAll('.card-type-option')
+          .forEach(o => o.classList.remove('selected'));
         opt.classList.add('selected');
         selectedCardType = opt.dataset.type;
       });
     });
-    document.getElementById('cancel-new-card').addEventListener('click', closeNewCard);
-    document.getElementById('confirm-new-card-btn').addEventListener('click', () => {
-      cards.push({ type: selectedCardType, label: cardThemes[selectedCardType]?.label || selectedCardType });
-      saveCards(cards);
-      currentCard = cards.length - 1;
-      renderSlider();
-      document.getElementById('new-card-inner').innerHTML = `
-        <div class="new-card-success">
-          <div class="new-card-success-icon">✅</div>
-          <h3>Картку створено!</h3>
-          <p>Тип: <strong style="color:var(--white)">${cardThemes[selectedCardType]?.label || selectedCardType}</strong><br/>Картка додана до вашого акаунту.</p>
-          <br/>
-          <button class="new-card-cancel" onclick="closeNewCard()" style="width:100%;padding:11px">Закрити</button>
-        </div>
-      `;
-    });
 
-    document.getElementById('new-card-modal').classList.remove('hidden');
-    document.getElementById('profile-menu').classList.add('hidden');
-  });
-
-  window.closeNewCard = function() {
-    document.getElementById('new-card-modal').classList.add('hidden');
-  };
-
-  // ── Вихід ──
-  document.getElementById('menu-logout-btn').addEventListener('click', () => {
-    clearStorage();
-    window.location.href = 'index.html';
-  });
-
-  // ── Форми (toggle без зміни розміру) ──
-  ['deposit', 'withdraw', 'transfer'].forEach(type => {
-    document.getElementById(`btn-open-${type}`).addEventListener('click', () => {
-      ['deposit', 'withdraw', 'transfer'].forEach(t => {
-        if (t !== type) document.getElementById(`${t}-form`).classList.add('hidden');
+    document
+      .getElementById('open-new-card-btn')
+      .addEventListener('click', () => {
+        document.getElementById('new-card-inner').innerHTML = `
+    <h3>Створити нову картку</h3>
+    <div class="new-card-types" id="card-type-list">
+      <div class="card-type-option selected" data-type="standard">
+        <div class="card-type-name">⬛ Standard</div>
+      <div class="card-type-desc">Безкоштовна • Базові функції</div>
+    </div>
+    <div class="card-type-option" data-type="premium">
+      <div class="card-type-name">💳 Premium Black</div>
+      <div class="card-type-desc">99 ₴/міс • Кешбек 2% • Пріоритет</div>
+    </div>
+    <div class="card-type-option" data-type="virtual">
+      <div class="card-type-name">Virtual</div>
+      <div class="card-type-desc">Безкоштовна • Тільки онлайн</div>
+    </div>
+    <div class="card-type-option" data-type="pikmi">
+      <div class="card-type-name">Pikmi</div>
+      <div class="card-type-desc">Для справжніх пікмі • Рожева • Slay ✦</div>
+    </div>
+  </div>
+  <div class="new-card-actions">
+    <button class="new-card-cancel" id="cancel-new-card">Скасувати</button>
+    <button class="new-card-confirm" id="confirm-new-card-btn">Створити</button>
+  </div>
+`;
+      selectedCardType = 'standard';
+      document.querySelectorAll('.card-type-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          document
+            .querySelectorAll('.card-type-option')
+            .forEach(o => o.classList.remove('selected'));
+          opt.classList.add('selected');
+          selectedCardType = opt.dataset.type;
+        });
       });
-      document.getElementById(`${type}-form`).classList.toggle('hidden');
-    });
-  });
-</script>
+      document
+        .getElementById('cancel-new-card')
+        .addEventListener('click', closeNewCard);
+      document
+        .getElementById('confirm-new-card-btn')
+        .addEventListener('click', () => {
+          cards.push({ 
+            type: selectedCardType, 
+            label: cardThemes[selectedCardType]?.label || selectedCardType, 
+          });
+          saveCards(cards);
+          currentCard = cards.length - 1;
+          renderSlider();
+          document.getElementById('new-card-inner').innerHTML = `
+      <div class="new-card-success">
+        <div class="new-card-success-icon">✅</div>
+        <h3>Картку створено!</h3>
+        <p>Тип: <strong style="color:var(--white)">${cardThemes[selectedCardType]?.label || selectedCardType}</strong><br/>Картка додана до вашого акаунту.</p>
+        <br/>
+        <button class="new-card-cancel" onclick="closeNewCard()" style="width:100%;padding:11px">Закрити</button>
+      </div>
+    `;
+          });
 
-</body>
+        document.getElementById('new-card-modal').classList.remove('hidden');
+        document.getElementById('profile-menu').classList.add('hidden');
+      });
+
+    window.closeNewCard = function() {
+      document.getElementById('new-card-modal').classList.add('hidden');
+    };
+
+    // ── Вихід ──
+    document
+    .getElementById('menu-logout-btn')
+    .addEventListener('click', () => {
+      clearStorage();
+      window.location.href = 'index.html';
+    });
+
+    // ── Форми (toggle без зміни розміру) ──
+    ['deposit', 'withdraw', 'transfer'].forEach(type => {
+      document
+        .getElementById(`btn-open-${type}`)
+        .addEventListener('click', () => {
+          ['deposit', 'withdraw', 'transfer'].forEach(t => {
+            if (t !== type) 
+            document.getElementById(`${t}-form`).classList.add('hidden');
+          });
+          document.getElementById(`${type}-form`).classList.toggle('hidden');
+        });
+    });
+
+    // ── Операції ──
+      document
+        .getElementById('deposit-form')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const amount = Number(
+            document.getElementById('deposit-amount').value,
+          );
+          const result = await depositRequest(amount);
+        if (result.success) {
+          setAccounts(result.accounts);
+          setTransactions(result.transactions);
+          renderSlider();
+          document.getElementById('deposit-form').classList.add('hidden');
+          document.getElementById('deposit-amount').value = '';
+        } else {
+          document.getElementById('deposit-error').textContent = 
+            result.message;
+        }
+      });
+
+      document
+        .getElementById('withdraw-form')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const amount = Number(
+            document.getElementById('withdraw-amount').value,
+          );
+          const result = await withdrawRequest(amount);
+          if (result.success) {
+            setAccounts(result.accounts);
+            setTransactions(result.transactions);
+            renderSlider();
+            document.getElementById('withdraw-form').classList.add('hidden');
+            document.getElementById('withdraw-amount').value = '';
+          } else {
+            document.getElementById('withdraw-error').textContent = 
+              result.message;
+          }
+        });
+
+      document
+        .getElementById('transfer-form')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const toUserId = document.getElementById('transfer-to').value;
+          const amount = Number(
+            document.getElementById('transfer-amount').value,
+          );
+          const result = await transferRequest(toUserId, amount);
+          if (result.success) {
+            setAccounts(result.accounts);
+            setTransactions(result.transactions);
+            renderSlider();
+            document.getElementById('transfer-form').classList.add('hidden');
+            document.getElementById('transfer-amount').value = '';
+            document.getElementById('transfer-to').value = '';
+          } else {
+            document.getElementById('transfer-error').textContent = 
+              result.message;
+          }
+        });
+  </script>
+
+  </body>
 </html>
