@@ -4,7 +4,7 @@ const { authMiddleware } = require("../middleware/auth");
 const { log } = require("../../src/logger");
 const fs = require("fs");
 const path = require("path");
-const { accounts, transactions } = require("./accounts");
+
 
 function readData() {
   const raw = fs.readFileSync(path.join(__dirname, "../data.json"), "utf-8");
