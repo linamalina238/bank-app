@@ -1,6 +1,5 @@
 require("dotenv").config({ path: "../.env" });
 const express = require("express");
-const data = require("./data.json");
 const { log } = require("../src/logger");
 const { authMiddleware } = require("./middleware/auth");
 const authRoutes = require("./routes/auth");
