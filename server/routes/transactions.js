@@ -64,7 +64,15 @@ router.post(
 
     writeData(data);
 
-    res.json({ success: true, accounts: [...data.accounts], transactions: [...data.transactions] });
+    const userAccount = data.accounts.find((a) => a.userId === fromUserId);
+    const userTransactions = data.transactions.filter(
+      (t) => t.fromId === fromUserId || t.toId === fromUserId,
+    );
+    res.json({
+      success: true,
+      accounts: userAccount ? [userAccount] : [],
+      transactions: userTransactions,
+    });
   }),
 );
 
