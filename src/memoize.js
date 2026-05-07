@@ -1,36 +1,36 @@
 export function memoize(fn, options = {}) {
-  const cache = {};
   const maxSize = options.maxSize || Infinity;
   const ttl = options.ttl || null;
-  let cacheSize = 0;
+  const policy = options.policy || "lru";
+
+  const cache = new Map();
 
   const memoized = function (...args) {
     const key = JSON.stringify(args);
 
-    if (cache[key] !== undefined) {
-      if (ttl && Date.now() - cache[key].timestamp > ttl) {
-        delete cache[key];
-        cacheSize--;
+    if (cache.has(key)) {
+      const entry = cache.get(key);
+      if (ttl && Date.now() - entry.timestamp > ttl) {
+        cache.delete(key);
       } else {
-        return cache[key].value;
+        if (policy === "lru") {
+          cache.delete(key);
+          cache.set(key, entry);
+        }
+        return entry.value;
       }
     }
 
-    if (cacheSize >= maxSize) {
-      const keys = Object.keys(cache);
-      delete cache[keys[0]];
-      cacheSize--;
+    if (cache.size >= maxSize) {
+      const oldestKey = cache.keys().next().value;
+      cache.delete(oldestKey);
     }
 
     const result = fn(...args);
-    cache[key] = { value: result, timestamp: Date.now() };
-    cacheSize++;
+    cache.set(key, { value: result, timestamp: Date.now() });
     return result;
   };
 
-  memoized.clear = () => {
-    Object.keys(cache).forEach((key) => delete cache[key]);
-    cacheSize = 0;
-  };
+  memoized.clear = () => cache.clear();
   return memoized;
 }
