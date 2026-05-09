@@ -1,14 +1,16 @@
-import { loginUser, registerUser } from './api.js';
+import { loginAndSave, registerAndSave, getCurrentUser, clearStorage } from './storage.js';
+import { validateLoginData, validateRegistrationData } from './validation.js';
+import { eventBus } from './eventBus.js';
 
 export async function handleLogin(email, password) {
-  if (!email || !password) {
-    return { success: false, message: "Please enter email and password" };
+  const validation = validateLoginData(email, password);
+  if (!validation.success) {
+    return validation;
   }
 
-  const result = await loginUser(email, password);
+  const result = await loginAndSave(email, password);
   
   if (result.success) {
-    localStorage.setItem("bank_user", JSON.stringify(result.user));
     console.log("User logged in:", result.user.name);
     return { success: true, user: result.user };
   } else {
@@ -18,14 +20,14 @@ export async function handleLogin(email, password) {
 }
 
 export async function handleRegister(name, email, password, phone) {
-  if (!name || !email || !password) {
-    return { success: false, message: "Please fill all fields" };
+  const validation = validateRegistrationData(name, email, password, phone);
+  if (!validation.success) {
+    return validation;
   }
 
-  const result = await registerUser(name, email, password, phone);
+  const result = await registerAndSave(name, email, password, phone);
   
   if (result.success) {
-    localStorage.setItem("bank_user", JSON.stringify(result.user));
     console.log("New user:", result.user.name);
     return { success: true, user: result.user };
   } else {
@@ -35,23 +37,24 @@ export async function handleRegister(name, email, password, phone) {
 }
 
 export function isAuthenticated() {
-  const user = localStorage.getItem("bank_user");
-  if (user) {
-    return true;
-  } else {
-    return false;
-  }
+  const user = getCurrentUser();
+  const token = localStorage.getItem("token");
+  return !!(user && token);
+}
+
+export function getCurrentUserFromStorage() {
+  return getCurrentUser();
 }
 
 export function logout() {
-  localStorage.removeItem("bank_user");
+  clearStorage();
   console.log("User logged out");
 }
 
-export function getCurrentUser() {
-  const user = localStorage.getItem("bank_user");
-  if (user) {
-    return JSON.parse(user);
-  }
-  return null;
+export function onUserLogin(callback) {
+  eventBus.subscribe("user:login", callback);
+}
+
+export function onUserLogout(callback) {
+  eventBus.subscribe("user:logout", callback);
 }

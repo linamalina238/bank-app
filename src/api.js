@@ -1,60 +1,41 @@
-const API_URL = "http://localhost:3000";
+import { BaseClient } from "./http/baseClient.js";
+import { AuthProxy } from "./http/authProxy.js";
+import { ApiService } from "./http/apiService.js";
 
-export async function loginUser(email, password) {
-  return apiRequest("/login", {
+const api = new ApiService(
+  new AuthProxy(new BaseClient(), () => localStorage.getItem("token")),
+);
+
+const baseClient = new BaseClient();
+
+export function loginUser(email, password) {
+  return baseClient.request({
+    url: "http://localhost:3000/login",
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: { email, password },
   });
 }
 
-export async function registerUser(name, email, password, phone) {
-  return apiRequest("/register", {
+export function registerUser(name, email, password, phone) {
+  return baseClient.request({
+    url: "http://localhost:3000/register",
     method: "POST",
-    body: JSON.stringify({ name, email, password, phone }),
+    body: { name, email, password, phone },
   });
 }
 
-export async function getInitData() {
-  return apiRequest("/init-data");
+export function getInitData() {
+  return api.getInitData();
 }
 
-export async function depositRequest(amount) {
-  return apiRequest("/deposit", {
-    method: "POST",
-    body: JSON.stringify({ amount }),
-  });
+export function depositRequest(amount) {
+  return api.deposit(amount);
 }
 
-export async function withdrawRequest(amount) {
-  return apiRequest("/withdraw", {
-    method: "POST",
-    body: JSON.stringify({ amount }),
-  });
+export function withdrawRequest(amount) {
+  return api.withdraw(amount);
 }
 
-export async function transferRequest(toUserId, amount) {
-  return apiRequest("/transfer", {
-    method: "POST",
-    body: JSON.stringify({ toUserId, amount }),
-  });
-}
-
-async function apiRequest(endpoint, options = {}) {
-  const token = localStorage.getItem("token");
-
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-  };
-
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
-  return response.json();
+export function transferRequest(toUserId, amount) {
+  return api.transfer(toUserId, amount);
 }

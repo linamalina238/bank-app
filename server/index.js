@@ -1,9 +1,12 @@
-require("dotenv").config();
+require("dotenv").config({ path: "../.env" });
 const express = require("express");
-const data = require("./data.json");
 const { log } = require("../src/logger");
 const { authMiddleware } = require("./middleware/auth");
 const authRoutes = require("./routes/auth");
+const { router: accountsRoutes } = require("./routes/accounts");
+const transactionsRoutes = require("./routes/transactions");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 app.use(express.json());
@@ -13,7 +16,7 @@ const PORT = process.env.PORT || 3000;
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Methods", "GET, POST");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
 
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
@@ -24,13 +27,27 @@ app.use((req, res, next) => {
 
 // Роути
 app.use(authRoutes);
+app.use(accountsRoutes);
+app.use(transactionsRoutes);
 
 // Захищений роут
 app.get(
   "/init-data",
   authMiddleware,
   log({ level: "INFO" })(async (req, res) => {
-    res.json(data);
+    const fresh = JSON.parse(
+      fs.readFileSync(path.join(__dirname, "data.json"), "utf-8"),
+    );
+    const userId = req.user.id;
+    const userAccount = fresh.accounts.find((a) => a.userId === userId);
+    const userTransactions = fresh.transactions.filter(
+      (t) => t.fromId === userId || t.toId === userId,
+    );
+    res.json({
+      balance: userAccount ? userAccount.balance : 0,
+      accounts: userAccount ? [userAccount] : [],
+      transactions: userTransactions,
+    });
   }),
 );
 
