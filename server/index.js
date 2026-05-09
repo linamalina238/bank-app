@@ -1,4 +1,4 @@
-﻿require("dotenv").config({ path: "../.env" });
+﻿require("dotenv").config();
 const express = require("express");
 const { log } = require("../src/logger");
 const { authMiddleware } = require("./middleware/auth");
@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3000;
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
@@ -54,9 +54,3 @@ app.get(
 app.listen(PORT, () => {
   console.log(`Сервер працює на http://localhost:${PORT}`);
 });
-
-const { router: accountRoutes } = require("./routes/accounts");
-const transactionRoutes = require("./routes/transactions");
-
-app.use(accountRoutes);
-app.use(transactionRoutes);
