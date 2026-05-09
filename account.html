@@ -1,94 +1,5 @@
 <!DOCTYPE html>
 <html lang="uk">
-<<<<<<< HEAD
-<head>
-  <meta charset="UTF-8"/>
-  <link rel="icon" href="https://www.shutterstock.com/image-vector/black-credit-card-icon-on-600nw-2632177557.jpg" type="image/x-icon">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bank App — Акаунт</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/style.css"/>
-</head>
-<body>
-
-<div id="dashboard-screen">
-
-  // Хедер 
-  <div class="dash-header">
-    <div class="dash-logo">Bank<span>HUB</span></div>
-    <div class="dash-header-right">
-      <div class="dash-avatar" id="user-avatar" onclick="toggleMenu()">U</div>
-    </div>
-  </div>
-
-  // Профіль меню 
-  <div class="profile-menu hidden" id="profile-menu">
-    <div class="profile-menu-top">
-      <label class="avatar-upload" for="avatar-input">
-        <div class="profile-menu-avatar" id="menu-avatar">U</div>
-        <div class="avatar-edit-hint">Змінити фото</div>
-      </label>
-      <input type="file" id="avatar-input" accept="image/*" style="display:none"/>
-      <div class="profile-menu-info">
-        <div class="profile-menu-name" id="menu-name"></div>
-        <div class="profile-menu-email" id="menu-email"></div>
-      </div>
-    </div>
-
-    // Кнопки 
-    <button class="profile-card-btn" id="open-card-btn">Моя картка</button>
-    <button class="profile-new-card-btn" id="open-new-card-btn">Створити картку</button>
-    <button class="profile-cashback-btn" id="open-cashback-btn">Кешбек</button>
-
-    <button class="profile-menu-logout" id="menu-logout-btn">Вийти</button>
-  </div>
-
-  // Модальне вікно картки — показує картки з головного слайдера 
-  <div class="card-modal hidden" id="card-modal">
-    <div class="card-modal-bg" onclick="closeCard()"></div>
-    <div class="card-modal-content">
-      <div id="card-modal-slider-wrap" style="width:320px;overflow:hidden;">
-        <div id="card-modal-slider" style="display:flex;transition:transform .35s ease;"></div>
-        <div id="card-modal-dots" style="display:flex;justify-content:center;gap:6px;margin-top:12px;"></div>
-      </div>
-      <button class="card-close-btn" onclick="closeCard()">Закрити</button>
-    </div>
-  </div>
-
-  // Модальне кешбеку 
-  <div class="cashback-modal hidden" id="cashback-modal">
-    <div class="cashback-modal-bg" onclick="closeCashback()"></div>
-    <div class="cashback-modal-content">
-      <h3>Ваш кешбек</h3>
-      <div class="cashback-amount" id="cashback-amount">0.00 ₴</div>
-      <p class="cashback-sub">Кешбек нараховується 1% від усіх витрат.<br/>Накопичено за весь час.</p>
-      <button class="cashback-close-btn" onclick="closeCashback()">Закрити</button>
-    </div>
-  </div>
-
-  // Модальне нової картки 
-  <div class="new-card-modal hidden" id="new-card-modal">
-    <div class="new-card-modal-bg" onclick="closeNewCard()"></div>
-    <div class="new-card-modal-content" id="new-card-inner">
-      <h3>Створити нову картку</h3>
-      <div class="new-card-types" id="card-type-list">
-        <div class="card-type-option selected" data-type="standard">
-          <div class="card-type-name">⬛ Standard</div>
-          <div class="card-type-desc">Безкоштовна • Базові функції</div>
-        </div>
-        <div class="card-type-option" data-type="premium">
-          <div class="card-type-name">💳 Premium Black</div>
-          <div class="card-type-desc">99 ₴/міс • Кешбек 2% • Пріоритет</div>
-        </div>
-        <div class="card-type-option" data-type="virtual">
-          <div class="card-type-name">Virtual</div>
-          <div class="card-type-desc">Безкоштовна • Тільки онлайн</div>
-        </div>
-        <div class="card-type-option" data-type="pikmi">
-          <div class="card-type-name">Pikmi</div>
-          <div class="card-type-desc">Для справжніх пікмі • Рожева • Slay ✦</div>
-=======
   <head>
     <meta charset="UTF-8"/>
     <link 
@@ -114,7 +25,6 @@
           <div class="dash-avatar" id="user-avatar" onclick="toggleMenu()">
             U
           </div>
->>>>>>> 8d53d1c681ab57b1b47df42cde802d6b26711c85
         </div>
       </div>
 
