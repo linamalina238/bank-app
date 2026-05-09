@@ -13,7 +13,7 @@
 
 <div id="dashboard-screen">
 
-  <!-- Хедер -->
+  // Хедер 
   <div class="dash-header">
     <div class="dash-logo">Bank<span>HUB</span></div>
     <div class="dash-header-right">
@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <!-- Профіль меню -->
+  // Профіль меню 
   <div class="profile-menu hidden" id="profile-menu">
     <div class="profile-menu-top">
       <label class="avatar-upload" for="avatar-input">
@@ -35,7 +35,7 @@
       </div>
     </div>
 
-    <!-- Кнопки -->
+    // Кнопки 
     <button class="profile-card-btn" id="open-card-btn">Моя картка</button>
     <button class="profile-new-card-btn" id="open-new-card-btn">Створити картку</button>
     <button class="profile-cashback-btn" id="open-cashback-btn">Кешбек</button>
@@ -43,7 +43,7 @@
     <button class="profile-menu-logout" id="menu-logout-btn">Вийти</button>
   </div>
 
-  <!-- Модальне вікно картки — показує картки з головного слайдера -->
+  // Модальне вікно картки — показує картки з головного слайдера 
   <div class="card-modal hidden" id="card-modal">
     <div class="card-modal-bg" onclick="closeCard()"></div>
     <div class="card-modal-content">
@@ -55,7 +55,7 @@
     </div>
   </div>
 
-  <!-- Модальне кешбеку -->
+  // Модальне кешбеку 
   <div class="cashback-modal hidden" id="cashback-modal">
     <div class="cashback-modal-bg" onclick="closeCashback()"></div>
     <div class="cashback-modal-content">
@@ -66,7 +66,7 @@
     </div>
   </div>
 
-  <!-- Модальне нової картки -->
+  // Модальне нової картки 
   <div class="new-card-modal hidden" id="new-card-modal">
     <div class="new-card-modal-bg" onclick="closeNewCard()"></div>
     <div class="new-card-modal-content" id="new-card-inner">
@@ -96,13 +96,13 @@
     </div>
   </div>
 
-  <!-- Скролл контент -->
+  // Скролл контент
   <div class="dash-scroll">
 
-    <!-- Слайдер карток -->
+    // Слайдер карток
     <div class="cards-slider-wrap">
       <div class="cards-slider" id="cards-slider">
-        <!-- картки додаються JS-ом -->
+        // картки додаються JS-ом
       </div>
       <div class="cards-slider-dots" id="cards-dots"></div>
     </div>
@@ -122,7 +122,7 @@
       </div>
     </div>
 
-    <!-- Форми (завжди в скролі, не змінюють розмір сторінки) -->
+    // Форми (завжди в скролі, не змінюють розмір сторінки) 
     <form id="deposit-form" class="dash-op-form hidden">
       <div class="dash-op-title">Поповнення</div>
       <input id="deposit-amount" type="number" placeholder="Сума (₴)" min="0.01" step="0.01"/>
@@ -155,11 +155,13 @@
   // ЗМІНА 1: додано saveCurrentUser в імпорт
   import { getCurrentUser, saveCurrentUser, clearStorage, getAccounts, getTransactions } from './src/storage.js';
   import { eventBus } from './src/eventBus.js';
+  import { deposit, withdraw } from './src/account.js';
+  import { transfer } from './src/transactions.js';
 
   const user = getCurrentUser();
   if (!user) window.location.href = 'index.html';
 
-  // ── Аватарка зі збереженням у localStorage ──
+  // Аватарка зі збереженням у localStorage
   const AVATAR_KEY = `bank_avatar_${user?.id}`;
 
   function getSavedAvatar() {
@@ -175,7 +177,7 @@
     document.getElementById('menu-avatar').innerHTML = imgHtml;
   }
 
-  // ── Оновлення UI ──
+  // Оновлення UI
   function updateUI() {
     const name = user.name || user.email || 'U';
     const letter = name[0].toUpperCase();
@@ -193,7 +195,7 @@
   }
   updateUI();
 
-  // ── Слайдер карток ──
+  // Слайдер карток
   const CARDS_KEY = `bank_cards_${user?.id}`;
 
   const cardThemes = {
@@ -555,14 +557,14 @@
 
   renderSlider();
 
-  // ── Баланс ──
+  // Баланс
   function updateBalance() {
     const balance = getBalance();
     document.querySelectorAll('.mini-card-balance').forEach(el => el.textContent = balance);
   }
   updateBalance();
 
-  // ── Транзакції ──
+  // Транзакції
   function updateTransactions() {
     const transactions = getTransactions();
     const list = document.getElementById('transactions-list');
@@ -586,7 +588,7 @@
   }
   updateTransactions();
 
-  // ── Кешбек (1% від витрат) ──
+  //  Кешбек (1% від витрат) 
   function calcCashback() {
     const transactions = getTransactions();
     const total = transactions
@@ -595,11 +597,11 @@
     return (total * 0.01).toFixed(2);
   }
 
-  // ── EventBus ──
+  //  EventBus 
   eventBus.subscribe('accounts:updated', () => updateBalance());
   eventBus.subscribe('transactions:updated', () => updateTransactions());
 
-  // ── Меню ──
+  //  Меню 
   window.toggleMenu = function() {
     document.getElementById('profile-menu').classList.toggle('hidden');
   };
@@ -626,7 +628,7 @@
   });
 
 
-  // ── Картка — показує всі картки зі слайдером ──
+  //  Картка — показує всі картки зі слайдером 
   let modalCard = 0;
 
   function renderCardModal() {
@@ -662,7 +664,7 @@
     document.getElementById('card-modal').classList.add('hidden');
   };
 
-  // ── Кешбек ──
+  // Кешбек
   document.getElementById('open-cashback-btn').addEventListener('click', () => {
     const cb = calcCashback();
     document.getElementById('cashback-amount').textContent = cb + ' ₴';
@@ -673,7 +675,7 @@
     document.getElementById('cashback-modal').classList.add('hidden');
   };
 
-  // ── Нова картка ──
+  // Нова картка 
   let selectedCardType = 'standard';
   document.querySelectorAll('.card-type-option').forEach(opt => {
     opt.addEventListener('click', () => {
@@ -742,13 +744,13 @@
     document.getElementById('new-card-modal').classList.add('hidden');
   };
 
-  // ── Вихід ──
+  // Вихід
   document.getElementById('menu-logout-btn').addEventListener('click', () => {
     clearStorage();
     window.location.href = 'index.html';
   });
 
-  // ── Форми (toggle без зміни розміру) ──
+  // Форми (toggle без зміни розміру)
   ['deposit', 'withdraw', 'transfer'].forEach(type => {
     document.getElementById(`btn-open-${type}`).addEventListener('click', () => {
       ['deposit', 'withdraw', 'transfer'].forEach(t => {
@@ -756,6 +758,45 @@
       });
       document.getElementById(`${type}-form`).classList.toggle('hidden');
     });
+  });
+  document.getElementById('deposit-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const amount = parseFloat(document.getElementById('deposit-amount').value);
+    if (!amount || amount <= 0) return;
+    const result = await deposit(amount);
+    if (result.success) {
+      document.getElementById('deposit-form').classList.add('hidden');
+      document.getElementById('deposit-form').reset();
+    } else {
+      document.getElementById('deposit-error').textContent = result.message || 'Помилка';
+    }
+  });
+
+  document.getElementById('withdraw-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const amount = parseFloat(document.getElementById('withdraw-amount').value);
+    if (!amount || amount <= 0) return;
+    const result = await withdraw(amount);
+    if (result.success) {
+      document.getElementById('withdraw-form').classList.add('hidden');
+      document.getElementById('withdraw-form').reset();
+    } else {
+      document.getElementById('withdraw-error').textContent = result.message || 'Помилка';
+    }
+  });
+
+  document.getElementById('transfer-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const toUserId = document.getElementById('transfer-to').value.trim();
+    const amount = parseFloat(document.getElementById('transfer-amount').value);
+    if (!toUserId || !amount || amount <= 0) return;
+    const result = await transfer(toUserId, amount);
+    if (result.success) {
+      document.getElementById('transfer-form').classList.add('hidden');
+      document.getElementById('transfer-form').reset();
+    } else {
+      document.getElementById('transfer-error').textContent = result.message || 'Помилка';
+    }
   });
 </script>
 

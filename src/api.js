@@ -3,14 +3,14 @@ const API_URL = "http://localhost:3000";
 export async function loginUser(email, password) {
   return apiRequest("/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ username: email, password }),
   });
 }
 
 export async function registerUser(name, email, password, phone) {
   return apiRequest("/register", {
     method: "POST",
-    body: JSON.stringify({ name, email, password, phone }),
+    body: JSON.stringify({ username: email, password }),
   });
 }
 
