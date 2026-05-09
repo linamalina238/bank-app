@@ -54,3 +54,9 @@ app.get(
 app.listen(PORT, () => {
   console.log(`Сервер працює на http://localhost:${PORT}`);
 });
+
+const { router: accountRoutes } = require("./routes/accounts");
+const transactionRoutes = require("./routes/transactions");
+
+app.use(accountRoutes);
+app.use(transactionRoutes);
