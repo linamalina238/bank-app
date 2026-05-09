@@ -1,45 +1,92 @@
 ﻿const express = require("express");
-const router = express.Router();
+const fs = require("fs");
+const path = require("path");
+const bcrypt = require("bcrypt");
+const { log } = require("../../src/logger");
 const { generateToken } = require("../middleware/auth");
 
-const users = [];
+const router = express.Router();
 
-// Реєстрація
-router.post("/register", (req, res) => {
-  const { username, password } = req.body;
+const usersPath = path.join(__dirname, "../users.json");
 
-  if (!username || !password) {
-    return res.json({ success: false, message: "Введіть логін і пароль" });
-  }
+function readUsers() {
+  return JSON.parse(fs.readFileSync(usersPath, "utf-8"));
+}
 
-  const exists = users.find((u) => u.username === username);
-  if (exists) {
-    return res.json({ success: false, message: "Користувач вже існує" });
-  }
+function writeUsers(users) {
+  fs.writeFileSync(usersPath, JSON.stringify(users, null, 2));
+}
 
-  const user = { id: Date.now().toString(), username, password };
-  users.push(user);
+router.post(
+  "/register",
+  log({ level: "INFO" })(async (req, res) => {
+    const { name, email, password, phone } = req.body;
+    const users = readUsers();
 
-  const token = generateToken(req, user);
+    if (users.find((u) => u.email === email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Користувач з такою поштою вже існує",
+      });
+    }
 
-  res.json({ success: true, token, user: { id: user.id, username } });
-});
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-// Логін
-router.post("/login", (req, res) => {
-  const { username, password } = req.body;
+    const newUser = {
+      id: Date.now().toString(),
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+    };
 
-  const user = users.find(
-    (u) => u.username === username && u.password === password
-  );
+    const token = generateToken(req, newUser);
 
-  if (!user) {
-    return res.json({ success: false, message: "Невірний логін або пароль" });
-  }
+    users.push(newUser);
+    writeUsers(users);
 
-  const token = generateToken(req, user);
+    const { password: _, ...safeUser } = newUser;
+    res.json({
+      success: true,
+      message: "Користувач успішно зареєстрований",
+      user: safeUser,
+      token,
+    });
+  }),
+);
 
-  res.json({ success: true, token, user: { id: user.id, username } });
-});
+router.post(
+  "/login",
+  log({ level: "INFO" })(async (req, res) => {
+    const { email, password } = req.body;
+    const users = readUsers();
+    const user = users.find((u) => u.email === email);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Невірна пошта або пароль",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Невірна пошта або пароль",
+      });
+    }
+
+    const token = generateToken(req, user);
+    const { password: _, ...safeUser } = user;
+
+    res.json({
+      success: true,
+      message: "Вхід успішний",
+      user: safeUser,
+      token,
+    });
+  }),
+);
 
 module.exports = router;

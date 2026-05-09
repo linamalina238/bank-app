@@ -1,69 +1,80 @@
-let toastTimer = null;
+import { loginAndSave, registerAndSave, clearStorage } from "./storage.js";
+import { getAccounts, getTransactions, getCurrentUser } from "./storage.js";
  
-export function showToast(message, type = 'info') {
-  const toast  = document.getElementById('povidomlennya');
-  const icon   = document.getElementById('toastIkona');
-  const text   = document.getElementById('toastTekst');
+export function showDashboard() {
+  document.getElementById("auth-screen").style.display = "none";
+  document.getElementById("dashboard-screen").style.display = "block";
+   
+  const user = getCurrentUser();
+    if (!user) return;
+
+    const accounts = getAccounts();
+    const account = accounts.find((acc) => acc.userId === user.id); 
+    if (account) renderBalance(account.balance);
+    renderTransactions(getTransactions());
+}    
  
-  if (!toast || !icon || !text) return;
- 
-  const icons = { success: '✓', error: '✕', info: 'ℹ' };
- 
-  icon.textContent = icons[type] ?? icons.info;
-  text.textContent = message;
- 
-  toast.className = `toast toast--${type} toast--visible`;
- 
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove('toast--visible');
-  }, 3000);
+export function showAuthScreen() {
+  document.getElementById("dashboard-screen").style.display = "none";
+  document.getElementById("auth-screen").style.display = "block";
 }
 
-function setFormLoading(form, loading) {
-  const btn     = form.querySelector('.btn-submit');
-  const label   = form.querySelector('.btn-label');
-  const spinner = form.querySelector('.spinner');
- 
-  if (!btn) return;
- 
-  btn.disabled = loading;
-  if (label)   label.style.opacity  = loading ? '0' : '1';
-  if (spinner) spinner.style.opacity = loading ? '1' : '0';
+export function renderUserInfo(user) {
+  const el = document.getElementById("user-name");
+  if (el) el.textContent = user.name;
 }
  
-function showFormError(errorId, message) {
-  const el = document.getElementById(errorId);
-  if (el) el.textContent = message;
+export function renderBalance(balance) {
+  const el = document.getElementById("account-balance");
+  if (el) el.textContent = `${balance.toFixed(2)} ₴`;
 }
  
-function clearFormError(errorId) {
-  const el = document.getElementById(errorId);
-  if (el) el.textContent = '';
-}
+export function renderTransactions(transactions) {
+  const list = document.getElementById("transactions-list");
+  if (!list) return;
+  if (transactions.length) {
+    list.innerHTML = "<p>Немає транзакцій</p>";
+    return;
+  }
 
-import { handleLogin, handleRegister } from './auth.js';
- 
+    list.innerHTML = transactions
+    .slice()
+    .reverse()
+    .map((t => {
+        const currentUser = getCurrentUser();
+        const isIncome = t.toId === currentUser.id;
+        return `
+        <div class="transaction ${isIncome ? 'income' : 'expense'}">
+            <span class="transaction-category">${t.category}</span>
+            <span class="transaction-amount">${isIncome ? '+' : '-'}${t.amount.toFixed(2)} ₴</span>
+            <span class="transaction-date">${new Date(t.date).toLocaleString()}</span>
+        </div>
+        `;
+    }))
+    .join("");
+}
+    
+export function initForms() {
+  initLoginForm();
+  initRegisterForm();
+  initLogoutButton();
+}        
+
 function initLoginForm() {
   const form = document.getElementById('login-form');
   if (!form) return;
  
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    clearFormError('login-error');
+    const email    = document.getElementById('login-email').value();
+    const password = document.getElementById('login-password').value;
  
-    const email    = document.getElementById('login-email')?.value.trim();
-    const password = document.getElementById('login-password')?.value;
+    const result = await loginAndSave(email, password);
  
-    setFormLoading(form, true);
-    const result = await handleLogin(email, password);
-    setFormLoading(form, false);
- 
-    if (result.success) {
-      showToast('Вхід успішний!', 'success');
+    if (!result.success) {
+      Error('login-error', result.message);
     } else {
-      showFormError('login-error', result.message || 'Помилка входу');
-      showToast(result.message || 'Помилка входу', 'error');
+     window.location.href = "account.html";
     }
   });
 }
@@ -74,120 +85,37 @@ function initRegisterForm() {
  
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    clearFormError('register-error');
+    const name = document.getElementById('register-name').value;
+    const email = document.getElementById('register-email').value;
+    const phone = document.getElementById('register-phone').value;
+    const password = document.getElementById('register-password').value;
  
-    const name     = document.getElementById('register-name')?.value.trim();
-    const email    = document.getElementById('register-email')?.value.trim();
-    const phone    = document.getElementById('register-phone')?.value.trim();
-    const password = document.getElementById('register-password')?.value;
+    const result = await registerAndSave(name, email, password, phone);
  
-    setFormLoading(form, true);
-    const result = await handleRegister(name, email, password, phone);
-    setFormLoading(form, false);
- 
-    if (result.success) {
-      showToast('Акаунт створено!', 'success');
+    if (!result.success) {
+      showError('register-error', result.message);
     } else {
-      showFormError('register-error', result.message || 'Помилка реєстрації');
-      showToast(result.message || 'Помилка реєстрації', 'error');
-    }
-  });
-}
-
-import { deposit, withdraw } from './account.js';
-import { transfer } from './transactions.js';
- 
-function initDepositForm() {
-  const form = document.getElementById('deposit-form');
-  if (!form) return;
- 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearFormError('deposit-error');
- 
-    const amount = parseFloat(document.getElementById('deposit-amount')?.value);
-    if (!amount || amount <= 0) {
-      showFormError('deposit-error', 'Введіть коректну суму');
-      return;
-    }
- 
-    const result = await deposit(amount);
- 
-    if (result.success) {
-      form.reset();
-      form.classList.add('hidden');
-      showToast(`Поповнено на ${amount.toFixed(2)} ₴`, 'success');
-    } else {
-      showFormError('deposit-error', result.message || 'Помилка поповнення');
-      showToast(result.message || 'Помилка поповнення', 'error');
+      window.location.href = "account.html";
     }
   });
 }
  
-function initWithdrawForm() {
-  const form = document.getElementById('withdraw-form');
-  if (!form) return;
+function initLogoutButton() {
+  const btn = document.getElementById('logout-btn');
+  if (!btn) return;
  
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearFormError('withdraw-error');
- 
-    const amount = parseFloat(document.getElementById('withdraw-amount')?.value);
-    if (!amount || amount <= 0) {
-      showFormError('withdraw-error', 'Введіть коректну суму');
-      return;
-    }
- 
-    const result = await withdraw(amount);
- 
-    if (result.success) {
-      form.reset();
-      form.classList.add('hidden');
-      showToast(`Знято ${amount.toFixed(2)} ₴`, 'success');
-    } else {
-      showFormError('withdraw-error', result.message || 'Помилка зняття');
-      showToast(result.message || 'Помилка зняття', 'error');
-    }
+  btn.addEventListener('click', () => {
+    clearStorage();
+    window.location.href = "index.html";
   });
 }
  
-function initTransferForm() {
-  const form = document.getElementById('transfer-form');
-  if (!form) return;
- 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearFormError('transfer-error');
- 
-    const toUserId = document.getElementById('transfer-to')?.value.trim();
-    const amount   = parseFloat(document.getElementById('transfer-amount')?.value);
- 
-    if (!toUserId) {
-      showFormError('transfer-error', 'Введіть ID отримувача');
-      return;
-    }
-    if (!amount || amount <= 0) {
-      showFormError('transfer-error', 'Введіть коректну суму');
-      return;
-    }
- 
-    const result = await transfer(toUserId, amount);
- 
-    if (result.success) {
-      form.reset();
-      form.classList.add('hidden');
-      showToast(`Переказано ${amount.toFixed(2)} ₴`, 'success');
-    } else {
-      showFormError('transfer-error', result.message || 'Помилка переказу');
-      showToast(result.message || 'Помилка переказу', 'error');
-    }
-  });
-}
-
-export function initForms() {
-  initLoginForm();
-  initRegisterForm();
-  initDepositForm();
-  initWithdrawForm();
-  initTransferForm();
-}
+function showError(elementId, message) {
+  const el = document.getElementById(elementId);
+  if (el) return;
+  el.textContent = message;
+  el.style.display = "block";
+    setTimeout(() => {
+        el.style.display = "none";
+    }, 3000);
+  }

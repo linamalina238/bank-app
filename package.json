@@ -1,14 +1,14 @@
 {
   "name": "bank-app",
-  "version": "1.3.0",
+  "version": "1.7.0",
   "description": "A banking web application — university course project",
-  "main": "src/index.js",
+  "main": "server/index.js",
   "authors": [
-    "Сітковська Аліна — auth.js",
-    "Наконечний Олег — account.js",
-    "Лобода Аліна — transactions.js",
-    "Поліщук Анна — ui.js",
-    "Варенко Катерина — storage.js"
+    "Варенко Катерина — storage.js, api.js, eventBus.js, memoize.js, logger.js, server/index.js, server/middleware/auth.js, server/routes/auth.js",
+    "Лобода Аліна — account.js, transactions.js, server/routes/accounts.js, server/routes/transactions.js",
+    "Євмененко Дмитро — auth.js, validation.js, server/routes/auth.js",
+    "Поліщук Анна — ui.js, index.js",
+    "Сітковська Аліна — account.html, index.html, style.css"
   ],
   "license": "MIT",
   "scripts": {
@@ -19,7 +19,10 @@
     "bank",
     "javascript",
     "university",
-    "coursework"
+    "coursework",
+    "jwt",
+    "bcrypt",
+    "express"
   ],
   "dependencies": {
     "bcrypt": "^6.0.0",

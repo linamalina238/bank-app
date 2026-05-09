@@ -122,4 +122,4 @@ export function clearStorage() {
   } catch (error) {
     console.error("Помилка очищення сховища", error);
   }
-}
+} 

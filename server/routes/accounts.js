@@ -53,7 +53,15 @@ router.post(
 
     writeData(data);
 
-    res.json({ success: true, accounts: [...data.accounts], transactions: [...data.transactions] });
+     const userAccount = data.accounts.find((a) => a.userId === userId);
+    const userTransactions = data.transactions.filter(
+      (t) => t.fromId === userId || t.toId === userId,
+    );
+    res.json({
+      success: true,
+      accounts: userAccount ? [userAccount] : [],
+      transactions: userTransactions,
+    });
   }),
 );
 
@@ -91,7 +99,15 @@ router.post(
 
     writeData(data);
 
-    res.json({ success: true, accounts: [...data.accounts], transactions: [...data.transactions] });
+   const userAccount = data.accounts.find((a) => a.userId === userId);
+    const userTransactions = data.transactions.filter(
+      (t) => t.fromId === userId || t.toId === userId,
+    );
+    res.json({
+      success: true,
+      accounts: userAccount ? [userAccount] : [],
+      transactions: userTransactions,
+    });
   }),
 );
 

@@ -4,7 +4,6 @@ const { authMiddleware } = require("../middleware/auth");
 const { log } = require("../../src/logger");
 const fs = require("fs");
 const path = require("path");
-const { accounts, transactions } = require("./accounts");
 
 function readData() {
   const raw = fs.readFileSync(path.join(__dirname, "../data.json"), "utf-8");
@@ -64,7 +63,15 @@ router.post(
 
     writeData(data);
 
-    res.json({ success: true, accounts: [...data.accounts], transactions: [...data.transactions] });
+    const userAccount = data.accounts.find((a) => a.userId === fromUserId);
+    const userTransactions = data.transactions.filter(
+      (t) => t.fromId === fromUserId || t.toId === fromUserId,
+    );
+    res.json({
+      success: true,
+      accounts: userAccount ? [userAccount] : [],
+      transactions: userTransactions,
+    });
   }),
 );
 
