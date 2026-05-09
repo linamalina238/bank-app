@@ -191,7 +191,7 @@ body{display:flex;align-items:center;justify-content:center}
 .toast.error .toast-icon{background:rgba(211,105,34,.2);color:var(--orange)}
 .toast.success .toast-icon{background:rgba(80,200,100,.2);color:#50c864}
 
-/* ===================== DASHBOARD ===================== */
+/* DASHBOARD */
 
 #dashboard-screen {
   position: fixed;

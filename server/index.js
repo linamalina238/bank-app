@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "../.env" });
+﻿require("dotenv").config({ path: "../.env" });
 const express = require("express");
 const { log } = require("../src/logger");
 const { authMiddleware } = require("./middleware/auth");
