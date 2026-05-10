@@ -66,7 +66,7 @@ function initLoginForm() {
  
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email    = document.getElementById('login-email').value();
+    const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
  
     const result = await loginAndSave(email, password);
